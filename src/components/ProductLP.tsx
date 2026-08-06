@@ -11,6 +11,7 @@ import {
   bundleTotal,
   bundleSaving,
   getProduct,
+  variantGallery,
 } from "@/lib/catalog";
 import { UI } from "@/lib/ui-copy";
 import { FORCELOG_CITIES } from "@/lib/cities";
@@ -55,11 +56,8 @@ export default function ProductLP({ product }: { product: LPProduct }) {
   const discount = bundleSaving(bundle, product.price);
   const discountPct = Math.round((1 - product.price / product.compareAt) * 100);
 
-  /** Toutes les photos : variante active d'abord, puis galerie + autres variantes */
-  const gallery = useMemo(
-    () => Array.from(new Set([variant.img, ...product.gallery, ...product.variants.map((v) => v.img)])),
-    [variant.img, product.gallery, product.variants]
-  );
+  /** Photos du modèle sélectionné (chaque variante a sa propre galerie) */
+  const gallery = useMemo(() => variantGallery(product, variant), [product, variant]);
 
   useEffect(() => setGalleryIdx(0), [variantKey]);
 
@@ -414,7 +412,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
             {product.variants.length > 1 && (
               <div className="mb-5">
                 <div className="mb-2 text-sm">
-                  <span className="font-bold">{t.color} :</span>{" "}
+                  <span className="font-bold">{t.model} :</span>{" "}
                   <span className="text-[#8a8172]">{tr(variant.label)}</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -431,6 +429,9 @@ export default function ProductLP({ product }: { product: LPProduct }) {
                     </button>
                   ))}
                 </div>
+                {variant.desc && (
+                  <p className="mt-2 text-sm leading-relaxed text-[#6b6353]">{tr(variant.desc)}</p>
+                )}
               </div>
             )}
 
@@ -615,7 +616,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
         {product.variants.length > 1 && (
           <div className="mt-6">
             <p className="mb-3 text-center text-sm font-bold text-[#4a4436]">
-              {t.color} — {product.variants.length} {t.available}
+              {t.model} — {product.variants.length} {t.available}
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               {product.variants.map((v) => (

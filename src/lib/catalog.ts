@@ -15,7 +15,7 @@ export const INSTAGRAM = "https://www.instagram.com/maison_dor_accessoires/";
 export type Lang = "fr" | "ar";
 export type L = { fr: string; ar: string };
 
-export type Variant = { key: string; label: L; img: string };
+export type Variant = { key: string; label: L; img: string; gallery?: string[]; desc?: L };
 export type Bundle = { qty: number; unit: number; badge?: L };
 export type Benefit = { icon: string; title: L; desc: L };
 export type Faq = { q: L; a: L };
@@ -180,457 +180,269 @@ const rev = (
    ═══════════════════════════════════════════════════════════ */
 
 export const PRODUCTS: LPProduct[] = [
-  /* ── 1. TULIP BICOLORE ────────────────────────────────── */
+  /* ═══════════════════════════════════════════════════════
+     1. ENSEMBLE TULIP — 5 modèles réunis sur une seule LP
+     ═══════════════════════════════════════════════════════ */
   {
-    slug: "parure-tulip-bicolore",
-    id: "tulip-bicolore",
+    slug: "parure-tulip",
+    id: "tulip",
     type: "Tulip",
     emoji: "🌷",
-    name: { fr: "Ensemble Tulip Bicolore", ar: "طقم Tulip ثنائي اللون" },
+    name: { fr: "Ensemble Tulip", ar: "طقم Tulip" },
     category: { fr: "Parures Tulip", ar: "أطقم Tulip" },
     headline: {
-      fr: "La parure qu'on vous remarque avant même de vous parler",
-      ar: "الطقم اللي كيتلاحظ قبل ما تهضري",
+      fr: "Collier + bracelet assortis — 5 modèles, un seul prix",
+      ar: "عقد + سوار متناسقين — 5 موديلات، ثمن واحد",
     },
     subheadline: {
-      fr: "Collier V et bracelet assortis, sertis de cristaux améthyste sur monture dorée feuillage. Plaqué or 18K qui ne ternit pas — livré en coffret, payé à la livraison.",
-      ar: "عقد V وسوار متناسق، مرصّعين بكريستال الأميتيست على قاعدة ذهبية بتصميم أوراق. مطلي بذهب 18 قيراط ما كيتغيرش — كيوصل فعلبة، والخلاص عند الاستلام.",
+      fr: "Parures florales serties de cristaux sur acier inoxydable plaqué or 18K ou argent rhodié. Choisissez votre modèle, on vous le livre en coffret — vous payez à la réception.",
+      ar: "أطقم زهرية مرصّعة بالكريستال على فولاذ مطلي بذهب 18 قيراط ولا فضة. ختاري الموديل ديالك، وكيوصلك فعلبة — وكتخلصي عند الاستلام.",
     },
     price: 149,
     compareAt: 219,
     rating: 4.9,
-    reviewCount: 127,
-    stock: 6,
+    reviewCount: 536,
+    stock: 7,
     hero: "v1782485773/prod5_white_C_c0yb8p.jpg",
     gallery: [
       "v1782485773/prod5_white_C_c0yb8p.jpg",
-      "v1782485767/prod4_black_C_r8wqhk.jpg",
-      "v1782146354/product_12_lskeyt.png",
-      "v1783970112/768b1aec724deadb6a4cc64a180ccfc7_1_1783969735_4237_xn6aze.png",
-    ],
-    variants: [
-      { key: "bicolore", label: { fr: "Doré · Améthyste", ar: "ذهبي · أميتيست" }, img: "v1782485773/prod5_white_C_c0yb8p.jpg" },
-    ],
-    bundles: bundlesFor(149, 20, 30),
-    usps: [
-      { fr: "Plaqué or 18K — ne noircit pas", ar: "مطلي بذهب 18 قيراط — ما كيسودش" },
-      { fr: "Collier + bracelet dans un coffret", ar: "عقد + سوار فعلبة هدية" },
-      { fr: "Livraison gratuite partout au Maroc", ar: "توصيل مجاني لكامل المغرب" },
-      { fr: "Payez uniquement à la réception", ar: "الخلاص غير عند الاستلام" },
-    ],
-    benefits: [
-      {
-        icon: "💜",
-        title: { fr: "L'améthyste qui capte la lumière", ar: "الأميتيست اللي كيلقط الضوء" },
-        desc: {
-          fr: "Les cristaux sont disposés en cascade, taille marquise : à chaque mouvement, la parure accroche la lumière et se voit sur les photos comme en vrai.",
-          ar: "الكريستال مرتب على شكل شلال: مع كل حركة كيلقط الضو، وكيبان فالتصاور بحال فالحقيقة.",
-        },
-      },
-      ...BENEFITS_BASE.slice(0, 3),
-    ],
-    included: INCLUDED_PARURE,
-    story: {
-      title: { fr: "Pourquoi elle plaît autant", ar: "علاش كيعجب هاد الطقم بزاف" },
-      body: {
-        fr: "La plupart des parures bicolores du marché se ternissent en quelques semaines : le laiton doré s'oxyde, la peau verdit, et le bijou finit au fond d'un tiroir. L'Ensemble Tulip Bicolore est construit autrement — une base en acier inoxydable chirurgical, un plaquage or 18K épais, et des cristaux sertis un par un plutôt que collés. Résultat : vous le portez au travail, en soirée, sous la douche, et il garde exactement le même éclat qu'au premier jour. C'est un bijou du quotidien qui se comporte comme un bijou de fête.",
-        ar: "غالبية الأطقم ثنائية اللون فالسوق كتسود من بعد شي أسابيع: النحاس المطلي كيتأكسد، الجلد كيخضر، والبيجو كيسالي فقاع التيروار. Tulip ثنائي اللون مصنوع بطريقة أخرى — قاعدة من الفولاذ المقاوم للصدأ، طلاء ذهبي 18 قيراط سميك، وكريستال مرصّع حبة بحبة ماشي ملصوق. النتيجة: كتلبسيه فالخدمة، فالسهرة، وحتى فالدوش، وكيبقى بنفس اللمعان ديال النهار الأول.",
-      },
-    },
-    specs: SPECS_ACIER,
-    faq: FAQ_BASE,
-    reviews: [
-      rev("Sara B.", "سارة ب.", "Casablanca", "الدار البيضاء", "Reçu en 24h, je l'ai ouvert devant le livreur. Franchement pour 149 dh je m'attendais à moins bien. La couleur est exactement comme sur les photos 🥰", "وصلني ف24 ساعة، حليتو قدام الموصّل. بصراحة ب149 درهم كنت كنتسنى شي حاجة أقل. اللون بحال بحال فالتصاور 🥰", 3),
-      rev("Imane K.", "إيمان ك.", "Marrakech", "مراكش", "Ça fait 2 mois que je le porte tous les jours, douche comprise, aucune trace de noir. J'ai commandé le 2ème pour ma sœur.", "هادي شهرين وأنا كنلبسو كل نهار، حتى فالدوش، ما كان لا سواد لا والو. طلبت الثاني لختي.", 8),
-      rev("Yasmine T.", "ياسمين ت.", "Rabat", "الرباط", "Le coffret fait vraiment cadeau, j'ai rien eu à emballer. Ma mère a adoré ✨", "العلبة كتبان بحال هدية بصح، ما احتاجيتش نغلف والو. ماما عجبها بزاف ✨", 12),
-      rev("Nawal A.", "نوال أ.", "Tanger", "طنجة", "J'ai la peau très sensible, je peux rien porter d'habitude. Là aucune rougeur au bout de 3 semaines.", "عندي بشرة حساسة بزاف، عادة ما كنقدرش نلبس والو. هنا ما كان حتى احمرار من بعد 3 سيمانات.", 15),
-      rev("Hafsa M.", "حفصة م.", "Fès", "فاس", "Livraison rapide et le vendeur m'a appelée pour confirmer. Sérieux, je recommande.", "التوصيل زربان والبائع عيط ليا باش يأكد. جديين، كنصحكم بيهم.", 21),
-      rev("Chaimae R.", "شيماء ر.", "Agadir", "أكادير", "Très joli mais la chaîne est un peu fine à mon goût. Ça reste top pour le prix.", "زوين بزاف ولكن السلسلة شوية رقيقة على ذوقي. ولكن يبقى ممتاز بهاد الثمن.", 26, 4),
-    ],
-    upsell: "parure-tulip-prestige",
-    seo: {
-      title: "Ensemble Tulip Bicolore 🌷 Collier + Bracelet Améthyste | Maison d'Or",
-      description:
-        "Parure Tulip bicolore : collier + bracelet plaqué or 18K sertis de cristaux améthyste. Ne ternit pas, hypoallergénique. Livraison gratuite au Maroc, paiement à la livraison.",
-    },
-  },
-
-  /* ── 2. TULIP PRESTIGE ────────────────────────────────── */
-  {
-    slug: "parure-tulip-prestige",
-    id: "tulip-prestige",
-    type: "Tulip",
-    emoji: "👑",
-    name: { fr: "Ensemble Tulip Prestige", ar: "طقم Tulip برستيج" },
-    category: { fr: "Parures Tulip", ar: "أطقم Tulip" },
-    headline: {
-      fr: "La parure des grandes occasions, au prix du quotidien",
-      ar: "طقم المناسبات الكبار، بثمن اليومي",
-    },
-    subheadline: {
-      fr: "Cristaux améthyste et rosé montés sur monture dorée aux motifs végétaux sculptés. Le modèle Tulip le plus travaillé — et celui qui part le plus vite en fin de semaine.",
-      ar: "كريستال أميتيست وزهري على قاعدة ذهبية بنقوش نباتية منحوتة. الموديل الأكثر تفصيلًا فمجموعة Tulip — وهو اللي كيسالي بسرعة فآخر الأسبوع.",
-    },
-    price: 149,
-    compareAt: 229,
-    rating: 4.9,
-    reviewCount: 94,
-    stock: 4,
-    hero: "v1782146330/product_1_eufnps.png",
-    gallery: [
       "v1782146330/product_1_eufnps.png",
-      "v1782485786/prod10_white_c_ffubmd.jpg",
-      "v1782485784/prod10_black_c_fwk74g.jpg",
-    ],
-    variants: [
-      { key: "prestige", label: { fr: "Doré · Améthyste & Rose", ar: "ذهبي · أميتيست وزهري" }, img: "v1782146330/product_1_eufnps.png" },
-    ],
-    bundles: bundlesFor(149, 20, 30),
-    usps: [
-      { fr: "Sertissage main, motifs sculptés", ar: "ترصيع يدوي ونقوش منحوتة" },
-      { fr: "Deux teintes de cristaux", ar: "لونين من الكريستال" },
-      { fr: "Livraison gratuite 24h–72h", ar: "توصيل مجاني من 24 ل 72 ساعة" },
-      { fr: "Paiement à la livraison", ar: "الخلاص عند الاستلام" },
-    ],
-    benefits: [
-      {
-        icon: "🌸",
-        title: { fr: "Deux teintes, un seul bijou", ar: "لونين، بيجو واحد" },
-        desc: {
-          fr: "L'alternance améthyste / rosé donne du relief à la parure : elle s'accorde aussi bien avec un caftan qu'avec une tenue de bureau.",
-          ar: "التناوب بين الأميتيست والزهري كيعطي عمق للطقم: كيمشي مع القفطان بحال مع لباس الخدمة.",
-        },
-      },
-      {
-        icon: "🔍",
-        title: { fr: "Le détail qu'on regarde de près", ar: "التفصيل اللي كيتشاف من قريب" },
-        desc: {
-          fr: "Les motifs végétaux sont sculptés dans la monture, pas imprimés. C'est ce qui fait la différence quand quelqu'un s'approche.",
-          ar: "النقوش النباتية منحوتة فالقاعدة، ماشي مطبوعة. هادشي هو الفرق منين شي حد كيقرب.",
-        },
-      },
-      ...BENEFITS_BASE.slice(0, 2),
-    ],
-    included: INCLUDED_PARURE,
-    story: {
-      title: { fr: "Pour quelles occasions ?", ar: "لأي مناسبات؟" },
-      body: {
-        fr: "Le Prestige a été pensé pour les moments où l'on veut être vue : fiançailles, mariage d'une amie, dîner de famille, séance photo. Mais comme il est en acier inoxydable plaqué or 18K et non en métal de fantaisie, rien ne vous empêche de le porter un mardi matin. C'est la différence entre un bijou d'occasion qui dort dans une boîte et un bijou que vous portez vraiment. Nos clientes commandent souvent le Prestige pour un événement précis — et finissent par le mettre toutes les semaines.",
-        ar: "البرستيج تصمم للحظات اللي بغيتي تبان فيها: الخطوبة، عرس صاحبتك، عشاء العائلة، جلسة تصوير. ولكن حيت مصنوع من الفولاذ المطلي بذهب 18 قيراط ماشي معدن عادي، ما كايناش مشكلة تلبسيه نهار الثلاثاء الصباح. هادا هو الفرق بين بيجو المناسبات اللي كينعس فالعلبة وبيجو كتلبسيه بصح.",
-      },
-    },
-    specs: SPECS_ACIER,
-    faq: FAQ_BASE,
-    reviews: [
-      rev("Meryem L.", "مريم ل.", "Casablanca", "الدار البيضاء", "Je l'ai porté au mariage de ma cousine, 4 personnes m'ont demandé où je l'avais acheté 😅", "لبستو فعرس بنت عمي، 4 نسا سولوني منين شريتو 😅", 5),
-      rev("Salma E.", "سلمى إ.", "Rabat", "الرباط", "Le rosé et le violet ensemble c'est vraiment beau en vrai, encore mieux que sur l'écran.", "الزهري والبنفسجي مع بعضهم زوينين بصح، حتى حسن من الشاشة.", 9),
-      rev("Fatima Zahra", "فاطمة الزهراء", "Meknès", "مكناس", "Commandé lundi, reçu mercredi à Meknès. Payé au livreur, tout s'est bien passé.", "طلبتو نهار الاثنين، وصلني الأربعاء لمكناس. خلصت للموصّل، وكلشي مشى مزيان.", 14),
-      rev("Khadija N.", "خديجة ن.", "Oujda", "وجدة", "La monture est vraiment travaillée, on sent que c'est pas du plastique doré. Très satisfaite.", "القاعدة مشغولة بصح، كيبان بللي ماشي بلاستيك مذهّب. راضية بزاف.", 19),
-      rev("Ghita B.", "غيثة ب.", "Tanger", "طنجة", "Un peu attendu 3 jours mais le service WhatsApp était réactif. Le bijou vaut l'attente.", "تسنيت 3 أيام ولكن خدمة واتساب كانت سريعة. البيجو كيستاهل التسناو.", 23, 4),
-      rev("Amal S.", "أمل س.", "Safi", "آسفي", "J'ai pris le pack de 2 avec ma sœur, on a économisé et on a la même 💕", "خديت باك ديال 2 مع ختي، وفرنا وولا عندنا بحال بحال 💕", 30),
-    ],
-    upsell: "parure-tulip-doree",
-    seo: {
-      title: "Ensemble Tulip Prestige 👑 Parure Améthyste & Rosé | Maison d'Or",
-      description:
-        "Parure Tulip Prestige : collier + bracelet en cristaux améthyste et rosé, monture dorée sculptée. Hypoallergénique, ne ternit pas. Livraison gratuite, paiement à la réception.",
-    },
-  },
-
-  /* ── 3. TULIP DORÉE ───────────────────────────────────── */
-  {
-    slug: "parure-tulip-doree",
-    id: "tulip-doree",
-    type: "Tulip",
-    emoji: "✨",
-    name: { fr: "Ensemble Tulip Dorée", ar: "طقم Tulip الذهبي" },
-    category: { fr: "Parures Tulip", ar: "أطقم Tulip" },
-    headline: {
-      fr: "Le doré et le cristal transparent : la combinaison qui va avec tout",
-      ar: "الذهبي والكريستال الشفاف: التركيبة اللي كتمشي مع كلشي",
-    },
-    subheadline: {
-      fr: "Collier et bracelet en vigne dorée sertis de cristaux transparents. Aucune couleur à assortir : il se marie avec n'importe quelle tenue, tous les jours de l'année.",
-      ar: "عقد وسوار بتصميم أغصان ذهبية مرصّعة بكريستال شفاف. بلا ما تحتاري فاللون: كيمشي مع أي لباس، كل أيام العام.",
-    },
-    price: 149,
-    compareAt: 219,
-    rating: 4.8,
-    reviewCount: 156,
-    stock: 8,
-    hero: "v1782485762/prod7_black_C_tlt0av.jpg",
-    gallery: [
       "v1782485762/prod7_black_C_tlt0av.jpg",
-      "v1782485761/prod7_white_c_qfwvfm.jpg",
-      "v1782146339/product_7_jyzzbg.png",
-      "v1782146338/product_4_c1mlob.png",
+      "v1782485785/prod9_white_c_b55akf.jpg",
+      "v1782485761/prod1_black_caree_dddkql.jpg",
     ],
     variants: [
-      { key: "doree", label: { fr: "Doré · Cristal", ar: "ذهبي · كريستال" }, img: "v1782485762/prod7_black_C_tlt0av.jpg" },
-      { key: "doree-clair", label: { fr: "Doré · Cristal clair", ar: "ذهبي · كريستال فاتح" }, img: "v1782485761/prod7_white_c_qfwvfm.jpg" },
+      {
+        key: "bicolore",
+        label: { fr: "Bicolore · Améthyste", ar: "ثنائي اللون · أميتيست" },
+        img: "v1782485773/prod5_white_C_c0yb8p.jpg",
+        desc: {
+          fr: "Collier V et bracelet sertis de cristaux améthyste en cascade, sur monture dorée aux motifs feuillage.",
+          ar: "عقد V وسوار مرصّعين بكريستال الأميتيست على شكل شلال، على قاعدة ذهبية بتصميم أوراق.",
+        },
+        gallery: [
+          "v1782485773/prod5_white_C_c0yb8p.jpg",
+          "v1782485767/prod4_black_C_r8wqhk.jpg",
+          "v1782146354/product_12_lskeyt.png",
+          "v1783970112/768b1aec724deadb6a4cc64a180ccfc7_1_1783969735_4237_xn6aze.png",
+        ],
+      },
+      {
+        key: "prestige",
+        label: { fr: "Prestige · Améthyste & Rosé", ar: "برستيج · أميتيست وزهري" },
+        img: "v1782146330/product_1_eufnps.png",
+        desc: {
+          fr: "Le modèle le plus travaillé : deux teintes de cristaux et motifs végétaux sculptés dans la monture.",
+          ar: "الموديل الأكثر تفصيلًا: لونين من الكريستال ونقوش نباتية منحوتة فالقاعدة.",
+        },
+        gallery: [
+          "v1782146330/product_1_eufnps.png",
+          "v1782485786/prod10_white_c_ffubmd.jpg",
+          "v1782485784/prod10_black_c_fwk74g.jpg",
+        ],
+      },
+      {
+        key: "doree",
+        label: { fr: "Dorée · Cristal", ar: "ذهبي · كريستال" },
+        img: "v1782485762/prod7_black_C_tlt0av.jpg",
+        desc: {
+          fr: "Vigne dorée et cristaux transparents : aucune couleur à assortir, il va avec toutes les tenues.",
+          ar: "أغصان ذهبية وكريستال شفاف: بلا لون خاصك تناسبيه، كيمشي مع كل الملابس.",
+        },
+        gallery: [
+          "v1782485762/prod7_black_C_tlt0av.jpg",
+          "v1782485761/prod7_white_c_qfwvfm.jpg",
+          "v1782146339/product_7_jyzzbg.png",
+          "v1782146338/product_4_c1mlob.png",
+        ],
+      },
+      {
+        key: "argentee",
+        label: { fr: "Argentée · Cristal", ar: "فضي · كريستال" },
+        img: "v1782485785/prod9_white_c_b55akf.jpg",
+        desc: {
+          fr: "Argent rhodié et cristaux taille marquise, pour celles qui préfèrent l'argent au doré.",
+          ar: "فضة وكريستال، لللي كتفضل الفضي على الذهبي.",
+        },
+        gallery: ["v1782485785/prod9_white_c_b55akf.jpg", "v1782485777/prod9_black_c_m47wyw.jpg"],
+      },
+      {
+        key: "rouge",
+        label: { fr: "Rouge · Rubis", ar: "أحمر · ياقوتي" },
+        img: "v1782485761/prod1_black_caree_dddkql.jpg",
+        desc: {
+          fr: "Cristaux rouge rubis sur monture argentée — le modèle des caftans et des soirées.",
+          ar: "كريستال أحمر ياقوتي على قاعدة فضية — موديل القفاطن والسهرات.",
+        },
+        gallery: [
+          "v1782485761/prod1_black_caree_dddkql.jpg",
+          "v1782513698/image_1782513620489_7rhkph_vjjjbk.jpg",
+        ],
+      },
     ],
     bundles: bundlesFor(149, 20, 30),
     usps: [
-      { fr: "Va avec toutes les tenues", ar: "كيمشي مع كل الملابس" },
-      { fr: "Cristaux transparents ultra-brillants", ar: "كريستال شفاف لماع بزاف" },
-      { fr: "Livraison gratuite au Maroc", ar: "توصيل مجاني فالمغرب" },
-      { fr: "Paiement à la livraison", ar: "الخلاص عند الاستلام" },
+      { fr: "5 modèles au même prix", ar: "5 موديلات بنفس الثمن" },
+      { fr: "Collier + bracelet en coffret", ar: "عقد + سوار فعلبة" },
+      { fr: "Ne noircit pas, ne verdit pas", ar: "ما كيسودش وما كيخضّرش" },
+      { fr: "Livraison gratuite · paiement à la réception", ar: "توصيل مجاني · الخلاص عند الاستلام" },
     ],
-    benefits: [
-      {
-        icon: "🤍",
-        title: { fr: "Zéro question de couleur", ar: "بلا مشكل ديال اللون" },
-        desc: {
-          fr: "Le cristal transparent ne rentre en conflit avec aucune couleur de vêtement. C'est la parure qu'on met sans réfléchir le matin.",
-          ar: "الكريستال الشفاف ما كيتعاركش مع أي لون ديال الحوايج. هادا هو الطقم اللي كتلبسيه بلا ما تفكري فالصباح.",
-        },
-      },
-      ...BENEFITS_BASE,
-    ].slice(0, 4),
+    benefits: BENEFITS_BASE,
     included: INCLUDED_PARURE,
     story: {
-      title: { fr: "Le bijou le plus porté de la collection", ar: "البيجو الأكثر لبسًا فالمجموعة" },
+      title: { fr: "Quel modèle Tulip choisir ?", ar: "شنو الموديل Tulip اللي تختاري؟" },
       body: {
-        fr: "C'est notre modèle le plus vendu, et la raison est simple : il ne demande aucun effort. Pas de couleur à assortir, pas d'occasion à attendre. Les cristaux transparents en taille marquise renvoient la lumière comme des pierres bien plus chères, et la vigne dorée reste discrète sur la peau. Beaucoup de clientes le commandent en premier pour tester la qualité — et reviennent ensuite pour un modèle coloré. Si vous hésitez entre plusieurs parures Tulip, commencez par celle-ci.",
-        ar: "هادا هو الموديل الأكثر مبيعًا عندنا، والسبب بسيط: ما كيطلب حتى مجهود. بلا لون خاصك تناسبيه، بلا مناسبة خاصك تسناها. الكريستال الشفاف كيرجع الضو بحال حجرة غالية بزاف، والأغصان الذهبية كتبقى هادية على الجلد. بزاف ديال الزبونات كيطلبوه الأول باش يجربو الجودة — ومن بعد كيرجعو لموديل ملون.",
+        fr: "Les cinq modèles partagent exactement la même fabrication : base en acier inoxydable, plaquage or 18K ou rhodiage argent, cristaux sertis un par un. La différence est purement esthétique. Bicolore et Prestige sont les plus habillés, avec leurs cristaux améthyste et rosé — ce sont ceux qu'on choisit pour un mariage ou un cadeau. Dorée est le plus polyvalent : cristal transparent, aucune couleur à assortir, c'est notre plus grosse vente. Argentée s'adresse à celles qui portent déjà de l'argent ou une montre en acier. Rouge est le plus affirmé, pensé pour le caftan et les soirées. Si vous hésitez, prenez Dorée : c'est celui qui se porte le plus souvent.",
+        ar: "الخمسة موديلات عندهم نفس الصناعة: قاعدة من الفولاذ المقاوم للصدأ، طلاء ذهبي 18 قيراط ولا فضي، وكريستال مرصّع حبة بحبة. الفرق غير جمالي. ثنائي اللون والبرستيج هوما الأكثر أناقة بالأميتيست والزهري — هوما اللي كيتختارو للعرس ولا للهدية. الذهبي هو الأكثر استعمالًا: كريستال شفاف، بلا لون خاصك تناسبيه، وهو الأكثر مبيعًا عندنا. الفضي لللي كتلبس الفضة ولا ماكينة ديال الفولاذ. والأحمر هو الأقوى، مصمم للقفطان والسهرات. إلى حتارتي، خدي الذهبي.",
       },
     },
     specs: SPECS_ACIER,
-    faq: FAQ_BASE,
-    reviews: [
-      rev("Loubna H.", "لبنى ح.", "Casablanca", "الدار البيضاء", "Mon 3ème achat chez eux. Celui-là je le mets tous les jours au bureau, il passe partout.", "هادا ثالث شراء عندهم. هادا كنلبسو كل نهار فالخدمة، كيمشي مع كلشي.", 2),
-      rev("Ikram D.", "إكرام د.", "Kénitra", "القنيطرة", "Les pierres brillent vraiment beaucoup, on dirait du vrai. Pour ce prix c'est imbattable.", "الحجرات كيبرقو بزاف، بحال الحقيقيين. بهاد الثمن ما كاين منو.", 6),
-      rev("Zineb F.", "زينب ف.", "Marrakech", "مراكش", "Je l'ai offert à ma belle-mère, elle m'a appelée pour me remercier deux fois 😂", "أهديتو لعمتي، عيطات ليا باش تشكرني جوج مرات 😂", 11),
-      rev("Hind M.", "هند م.", "Tétouan", "تطوان", "Emballage soigné, bijou conforme. Livreur arrivé le lendemain, rien à redire.", "التغليف مزيان، والبيجو مطابق. الموصّل جا غدا، ما عندي ما نقول.", 17),
-      rev("Rania A.", "رانية أ.", "El Jadida", "الجديدة", "Simple et élégant. Je cherchais quelque chose de discret pour le travail, c'est parfait.", "بسيط وأنيق. كنت كنقلب على شي حاجة هادية للخدمة، وهادا مزيان بزاف.", 24),
-      rev("Souad B.", "سعاد ب.", "Nador", "الناظور", "Reçu en 3 jours au lieu de 2, mais la qualité est là. Je recommande quand même.", "وصلني ف3 أيام عوض 2، ولكن الجودة كاينة. كنصح بيه على كل حال.", 29, 4),
+    faq: [
+      {
+        q: { fr: "Les 5 modèles sont-ils au même prix ?", ar: "واش الخمسة موديلات بنفس الثمن؟" },
+        a: {
+          fr: "Oui, 149 dh quel que soit le modèle choisi, livraison comprise. Le pack de 2 ou 3 peut mélanger les modèles : indiquez-le simplement lors de l'appel de confirmation.",
+          ar: "إيه، 149 درهم لأي موديل، والتوصيل داخل. الباك ديال 2 ولا 3 تقدري تخلطي فيه الموديلات: غير قوليها للمكلف منين نعيطو ليك باش نأكدو.",
+        },
+      },
+      ...FAQ_BASE,
     ],
-    upsell: "parure-tulip-argentee",
+    reviews: [
+      rev("Sara B.", "سارة ب.", "Casablanca", "الدار البيضاء", "J'ai pris la Bicolore, reçue en 24h et ouverte devant le livreur. Pour 149 dh je m'attendais à moins bien 🥰", "خديت ثنائي اللون، وصلاتني ف24 ساعة وحليتها قدام الموصّل. ب149 درهم كنت كنتسنى أقل 🥰", 3),
+      rev("Imane K.", "إيمان ك.", "Marrakech", "مراكش", "2 mois de port quotidien avec la Dorée, douche comprise, aucune trace de noir. J'ai repris la Rouge après.", "شهرين وأنا لابسة الذهبي كل نهار، حتى فالدوش، بلا سواد. من بعد خديت الأحمر.", 8),
+      rev("Meryem L.", "مريم ل.", "Rabat", "الرباط", "La Prestige au mariage de ma cousine : 4 personnes m'ont demandé où je l'avais achetée 😅", "البرستيج فعرس بنت عمي: 4 نسا سولوني منين شريتها 😅", 5),
+      rev("Btissam O.", "ابتسام و.", "Fès", "فاس", "Enfin une parure argentée qui ne noircit pas au bout d'un mois. Ça faisait longtemps que je cherchais.", "أخيرًا طقم فضي ما كيسودش من بعد شهر. هادي مدة وأنا كنقلب.", 11),
+      rev("Kenza M.", "كنزة م.", "Tanger", "طنجة", "La Rouge sur un caftan blanc, effet garanti. Le rouge est vraiment profond, pas orange.", "الأحمر على قفطان أبيض، النتيجة مضمونة. الأحمر عميق بصح، ماشي برتقالي.", 16),
+      rev("Amal S.", "أمل س.", "Agadir", "أكادير", "Pack de 2 avec ma sœur : elle a pris la Prestige, moi la Dorée. Livré ensemble, payé au livreur.", "باك ديال 2 مع ختي: هي خديت البرستيج وأنا الذهبي. وصلونا مع بعض، وخلصنا للموصّل.", 22),
+    ],
+    upsell: "parure-swan",
     seo: {
-      title: "Ensemble Tulip Dorée ✨ Collier + Bracelet Cristal | Maison d'Or",
+      title: "Ensemble Tulip 🌷 Collier + Bracelet — 5 modèles, 149 dh | Maison d'Or",
       description:
-        "Parure Tulip Dorée : collier + bracelet en vigne dorée sertis de cristaux transparents. Résiste à l'eau et au parfum. Livraison gratuite au Maroc, paiement à la livraison.",
+        "Parure Tulip : collier + bracelet sertis de cristaux, 5 modèles au choix (Bicolore, Prestige, Dorée, Argentée, Rouge). Ne ternit pas, hypoallergénique. Livraison gratuite au Maroc, paiement à la livraison.",
     },
   },
 
-  /* ── 4. TULIP ARGENTÉE ────────────────────────────────── */
+  /* ═══════════════════════════════════════════════════════
+     2. ENSEMBLE SWAN — 2 modèles réunis
+     ═══════════════════════════════════════════════════════ */
   {
-    slug: "parure-tulip-argentee",
-    id: "tulip-argentee",
-    type: "Tulip",
-    emoji: "🤍",
-    name: { fr: "Ensemble Tulip Argentée", ar: "طقم Tulip الفضي" },
-    category: { fr: "Parures Tulip", ar: "أطقم Tulip" },
-    headline: {
-      fr: "Pour celles qui préfèrent l'argent au doré",
-      ar: "لللي كتفضل الفضي على الذهبي",
-    },
-    subheadline: {
-      fr: "Argent rhodié et cristaux transparents taille marquise. Une élégance sobre, sans ostentation — le bijou qui se remarque sans crier.",
-      ar: "فضة مرصّعة وكريستال شفاف. أناقة هادية بلا مبالغة — البيجو اللي كيتلاحظ بلا ما يغوّت.",
-    },
-    price: 149,
-    compareAt: 219,
-    rating: 4.8,
-    reviewCount: 88,
-    stock: 7,
-    hero: "v1782485785/prod9_white_c_b55akf.jpg",
-    gallery: [
-      "v1782485785/prod9_white_c_b55akf.jpg",
-      "v1782485777/prod9_black_c_m47wyw.jpg",
-    ],
-    variants: [
-      { key: "argentee", label: { fr: "Argenté · Cristal", ar: "فضي · كريستال" }, img: "v1782485785/prod9_white_c_b55akf.jpg" },
-    ],
-    bundles: bundlesFor(149, 20, 30),
-    usps: [
-      { fr: "Argent rhodié, ne s'oxyde pas", ar: "فضة مرصّعة ما كتتأكسدش" },
-      { fr: "Taille marquise, éclat maximal", ar: "قص مارکيز، لمعان أقصى" },
-      { fr: "Livraison gratuite 24h–72h", ar: "توصيل مجاني من 24 ل 72 ساعة" },
-      { fr: "Paiement à la livraison", ar: "الخلاص عند الاستلام" },
-    ],
-    benefits: [
-      {
-        icon: "🌙",
-        title: { fr: "L'argent qui ne noircit pas", ar: "الفضي اللي ما كيسودش" },
-        desc: {
-          fr: "Le rhodiage protège la surface : contrairement à l'argent classique, vous n'aurez jamais à le frotter pour lui rendre son éclat.",
-          ar: "الطلاء كيحمي السطح: عكس الفضة العادية، عمرك ما غادي تحتاجي تحكيه باش يرجع ليه اللمعان.",
-        },
-      },
-      ...BENEFITS_BASE.slice(1, 4),
-    ],
-    included: INCLUDED_PARURE,
-    story: {
-      title: { fr: "Argent ou doré : comment choisir", ar: "فضي ولا ذهبي: كيفاش تختاري" },
-      body: {
-        fr: "Règle simple : si les veines de votre poignet tirent vers le bleu, l'argent vous ira mieux ; si elles tirent vers le vert, c'est le doré. Mais au-delà de la théorie, l'argenté a un avantage pratique : il se marie avec une montre en acier, des lunettes fines, un sac à fermoir argenté — l'ensemble reste cohérent. C'est aussi le choix de celles qui trouvent le doré trop voyant au quotidien. La parure Tulip Argentée est notre réponse à cette demande : même travail de sertissage, même résistance, teinte plus discrète.",
-        ar: "قاعدة بسيطة: إلى كانو العروق ديال يدك ضاربين للزرق، الفضي غادي يجيك حسن؛ وإلى ضاربين للخضر، الذهبي. ولكن بعيدًا على النظرية، الفضي عندو فايدة عملية: كيمشي مع ماكينة ديال الفولاذ، نظاظر رقاق، وساك بقفل فضي. وهو تاني اختيار لللي كيشوفو الذهبي بزاف فاليومي.",
-      },
-    },
-    specs: [
-      { label: { fr: "Matière", ar: "المادة" }, value: { fr: "Acier inoxydable rhodié argent", ar: "فولاذ مقاوم للصدأ مطلي بالفضة" } },
-      ...SPECS_ACIER.slice(1),
-    ],
-    faq: FAQ_BASE,
-    reviews: [
-      rev("Btissam O.", "ابتسام و.", "Rabat", "الرباط", "Enfin une parure argentée qui ne noircit pas au bout d'un mois. Ça faisait longtemps que je cherchais.", "أخيرًا طقم فضي ما كيسودش من بعد شهر. هادي مدة وأنا كنقلب.", 4),
-      rev("Nada C.", "ندى س.", "Casablanca", "الدار البيضاء", "Je porte une montre en acier, ça va parfaitement ensemble. Très contente.", "كنلبس ماكينة ديال الفولاذ، وكيمشيو مزيان مع بعضهم. راضية بزاف.", 7),
-      rev("Oumaima Z.", "أميمة ز.", "Fès", "فاس", "Discret et classe, exactement ce que je voulais pour tous les jours.", "هادي وأنيقة، بالضبط اللي كنت بغيت لليومي.", 13),
-      rev("Sanae K.", "سناء ك.", "Agadir", "أكادير", "Les cristaux brillent beaucoup plus que ce que je pensais. Bonne surprise.", "الكريستال كيبرق بزاف أكثر مما كنت كنتصور. مفاجأة زوينة.", 18),
-      rev("Widad L.", "وداد ل.", "Beni Mellal", "بني ملال", "Livraison à Beni Mellal en 2 jours, payé au livreur. Aucun souci.", "التوصيل لبني ملال ف يومين، خلصت للموصّل. بلا حتى مشكل.", 22),
-      rev("Asmae T.", "أسماء ت.", "Salé", "سلا", "Joli mais j'aurais aimé un fermoir un peu plus solide. Sinon rien à dire.", "زوين ولكن كنت نبغي القفل يكون شوية قوي. غير هادشي ما عندي ما نقول.", 27, 4),
-    ],
-    upsell: "parure-tulip-rouge",
-    seo: {
-      title: "Ensemble Tulip Argentée 🤍 Parure Cristal Argent | Maison d'Or",
-      description:
-        "Parure Tulip Argentée : collier + bracelet en argent rhodié sertis de cristaux marquise. Hypoallergénique, ne noircit pas. Livraison gratuite au Maroc, paiement à la réception.",
-    },
-  },
-
-  /* ── 5. TULIP ROUGE ───────────────────────────────────── */
-  {
-    slug: "parure-tulip-rouge",
-    id: "tulip-rouge",
-    type: "Tulip",
-    emoji: "❤️",
-    name: { fr: "Ensemble Tulip Rouge", ar: "طقم Tulip الأحمر" },
-    category: { fr: "Parures Tulip", ar: "أطقم Tulip" },
-    headline: {
-      fr: "Rouge rubis : le bijou qu'on ne peut pas ignorer",
-      ar: "أحمر ياقوتي: البيجو اللي ما يمكنش تجاهلو",
-    },
-    subheadline: {
-      fr: "Cristaux rouge rubis sur monture argentée, dessinés en motifs floraux. Pour les soirées, les caftans, et les femmes qui n'ont pas envie de passer inaperçues.",
-      ar: "كريستال أحمر ياقوتي على قاعدة فضية، بتصميم زهري. للسهرات، للقفاطن، وللنساء اللي ما بغاوش يمرو بلا ما يتلاحظو.",
-    },
-    price: 149,
-    compareAt: 229,
-    rating: 4.9,
-    reviewCount: 71,
-    stock: 5,
-    hero: "v1782485761/prod1_black_caree_dddkql.jpg",
-    gallery: [
-      "v1782485761/prod1_black_caree_dddkql.jpg",
-      "v1782513698/image_1782513620489_7rhkph_vjjjbk.jpg",
-    ],
-    variants: [
-      { key: "rouge", label: { fr: "Argenté · Rubis", ar: "فضي · ياقوتي" }, img: "v1782485761/prod1_black_caree_dddkql.jpg" },
-    ],
-    bundles: bundlesFor(149, 20, 30),
-    usps: [
-      { fr: "Rouge rubis intense", ar: "أحمر ياقوتي قوي" },
-      { fr: "Parfait avec un caftan", ar: "مثالي مع القفطان" },
-      { fr: "Livraison gratuite au Maroc", ar: "توصيل مجاني فالمغرب" },
-      { fr: "Paiement à la livraison", ar: "الخلاص عند الاستلام" },
-    ],
-    benefits: [
-      {
-        icon: "🔥",
-        title: { fr: "La couleur qui structure une tenue", ar: "اللون اللي كينظم اللبسة" },
-        desc: {
-          fr: "Un rouge profond sur monture argentée : il suffit à donner du caractère à une tenue neutre, sans avoir besoin d'autre accessoire.",
-          ar: "أحمر عميق على قاعدة فضية: كافي باش يعطي شخصية للبسة عادية، بلا ما تحتاجي أي إكسسوار آخر.",
-        },
-      },
-      {
-        icon: "👗",
-        title: { fr: "Pensé pour le caftan et la soirée", ar: "مصمم للقفطان والسهرة" },
-        desc: {
-          fr: "Le rubis ressort particulièrement sur les tissus dorés, blancs et noirs — les trois bases du caftan marocain.",
-          ar: "الياقوتي كيبان بزاف على الأثواب الذهبية، البيضة والكحلة — الثلاثة ديال القفطان المغربي.",
-        },
-      },
-      ...BENEFITS_BASE.slice(0, 2),
-    ],
-    included: INCLUDED_PARURE,
-    story: {
-      title: { fr: "Un rouge qui ne vire pas au orange", ar: "أحمر ما كيولّيش برتقالي" },
-      body: {
-        fr: "Le problème des bijoux rouges bon marché, c'est la pierre : un verre teinté qui vire à l'orange sous la lumière artificielle et qui perd sa couleur en quelques mois. Ici, les cristaux sont teintés dans la masse et sertis griffe par griffe. Sous les lumières d'une salle de fête comme à la lumière du jour, le rouge reste profond, presque bordeaux. C'est ce qui permet à la parure de fonctionner aussi bien sur un caftan doré que sur une simple robe noire.",
-        ar: "المشكل ديال المجوهرات الحمرة الرخيصة هو الحجرة: زاج ملون كيولي برتقالي تحت الضو الاصطناعي وكيسالي لونو من بعد شهور. هنا، الكريستال ملون فالعمق ومرصّع حبة بحبة. تحت أضواء قاعة الأعراس ولا فضو النهار، الأحمر كيبقى عميق، قريب للبوردو.",
-      },
-    },
-    specs: [
-      { label: { fr: "Matière", ar: "المادة" }, value: { fr: "Acier inoxydable rhodié argent", ar: "فولاذ مقاوم للصدأ مطلي بالفضة" } },
-      { label: { fr: "Pierres", ar: "الأحجار" }, value: { fr: "Cristaux rouge rubis sertis griffes", ar: "كريستال أحمر ياقوتي مرصّع" } },
-      ...SPECS_ACIER.slice(2),
-    ],
-    faq: FAQ_BASE,
-    reviews: [
-      rev("Kenza M.", "كنزة م.", "Casablanca", "الدار البيضاء", "Porté sur un caftan blanc pour un mariage, effet garanti. Le rouge est vraiment profond.", "لبستو على قفطان أبيض فعرس، والنتيجة مضمونة. الأحمر عميق بصح.", 3),
-      rev("Rim A.", "ريم أ.", "Marrakech", "مراكش", "J'avais peur que ça fasse trop, mais non, c'est élégant. Beaucoup de compliments.", "كنت خايفة يكون بزاف، ولكن لا، أنيق. تلقيت بزاف ديال المجاملات.", 10),
-      rev("Doha B.", "ضحى ب.", "Rabat", "الرباط", "Reçu très vite, coffret impeccable. Je le garde pour l'Aïd.", "وصلني بزربة، العلبة نقية. غادي نحتافظ بيه للعيد.", 16),
-      rev("Hajar S.", "هاجر س.", "Tanger", "طنجة", "La couleur est fidèle aux photos, ça c'est important. Merci.", "اللون مطابق للتصاور، وهادشي مهم. شكرًا.", 20),
-      rev("Nisrine K.", "نسرين ك.", "Khouribga", "خريبكة", "Très belle parure, ma fille me l'emprunte tout le temps 😅", "طقم زوين بزاف، بنتي ديما كتسلفو مني 😅", 25),
-      rev("Maria E.", "ماريا إ.", "Mohammedia", "المحمدية", "Bien mais le collier est un peu court pour moi. Le bracelet par contre est parfait.", "مزيان ولكن العقد شوية قصير عليا. السوار بالعكس مزيان.", 28, 4),
-    ],
-    upsell: "parure-swan-noir",
-    seo: {
-      title: "Ensemble Tulip Rouge ❤️ Parure Cristal Rubis | Maison d'Or",
-      description:
-        "Parure Tulip Rouge : collier + bracelet en cristaux rouge rubis sur monture argentée. Idéale caftan et soirée. Livraison gratuite au Maroc, paiement à la livraison.",
-    },
-  },
-
-  /* ── 6. SWAN NOIR ─────────────────────────────────────── */
-  {
-    slug: "parure-swan-noir",
-    id: "swan-noir",
+    slug: "parure-swan",
+    id: "swan",
     type: "Swan",
     emoji: "🦢",
-    name: { fr: "Ensemble Swan Améthyste", ar: "طقم Swan أميتيست" },
+    name: { fr: "Ensemble Swan", ar: "طقم Swan" },
     category: { fr: "Parures Swan", ar: "أطقم Swan" },
     headline: {
       fr: "Le pendentif cygne qu'on vous demandera d'où il vient",
       ar: "دلاية البجعة اللي غادي يسولوك منين جبتيها",
     },
     subheadline: {
-      fr: "Collier et bracelet en cristaux violets sur argent rhodié, sublimés par un pendentif cygne sculpté. Une pièce qui raconte quelque chose — pas juste une pierre de plus.",
-      ar: "عقد وسوار بكريستال بنفسجي على فضة، مع دلاية بجعة منحوتة. قطعة كتحكي شي حاجة — ماشي غير حجرة زايدة.",
+      fr: "Collier à pendentif cygne sculpté et bracelet assorti. 6 coloris au choix, tous au même prix. Livré en coffret, payé à la réception.",
+      ar: "عقد بدلاية بجعة منحوتة وسوار متناسق. 6 ألوان على اختيارك، كلهم بنفس الثمن. كيوصل فعلبة، والخلاص عند الاستلام.",
     },
     price: 139,
     compareAt: 199,
     rating: 4.9,
-    reviewCount: 143,
+    reviewCount: 251,
     stock: 6,
     hero: "v1782146353/product_11_hr9u2c.png",
     gallery: [
       "v1782146353/product_11_hr9u2c.png",
+      "v1782146354/product_9_d9gry9.png",
       "v1782485788/prod12_black_c_nqjzw6.jpg",
-      "v1782485789/prod12_white_c_cg7zrs.jpg",
-      "v1782146355/product_10_gebr70.png",
+      "v1782498863/image_1782498828281_jnc8yf_kmfzqo.jpg",
+      "v1782485781/prod6_whie_c_ne2gnl.jpg",
+      "v1782485766/prod2_white_C_gvnwin.jpg",
     ],
     variants: [
-      { key: "noir", label: { fr: "Argenté · Améthyste", ar: "فضي · أميتيست" }, img: "v1782146353/product_11_hr9u2c.png" },
-      { key: "noir-nuit", label: { fr: "Argenté · Nuit", ar: "فضي · ليلي" }, img: "v1782485788/prod12_black_c_nqjzw6.jpg" },
+      {
+        key: "amethyste",
+        label: { fr: "Améthyste", ar: "أميتيست" },
+        img: "v1782146353/product_11_hr9u2c.png",
+        desc: {
+          fr: "Cristaux violets sur argent rhodié — le violet met particulièrement en valeur les peaux mates.",
+          ar: "كريستال بنفسجي على الفضة — البنفسجي كيبرز البشرة القمحية بزاف.",
+        },
+        gallery: ["v1782146353/product_11_hr9u2c.png", "v1782146355/product_10_gebr70.png"],
+      },
+      {
+        key: "blanc",
+        label: { fr: "Blanc", ar: "أبيض" },
+        img: "v1782146354/product_9_d9gry9.png",
+        desc: {
+          fr: "Cristaux transparents : la version qu'on offre, elle va à toutes les tenues et à tous les âges.",
+          ar: "كريستال شفاف: النسخة اللي كتنهدى، كتمشي مع كل الملابس وكل الأعمار.",
+        },
+        gallery: ["v1782146354/product_9_d9gry9.png", "v1782146355/product_10_gebr70.png"],
+      },
+      {
+        key: "noir-dore",
+        label: { fr: "Noir & Doré", ar: "أسود · ذهبي" },
+        img: "v1782485788/prod12_black_c_nqjzw6.jpg",
+        desc: {
+          fr: "Cristaux noirs sur monture dorée — le contraste le plus fort de la collection Swan.",
+          ar: "كريستال أسود على قاعدة ذهبية — أقوى تباين فمجموعة Swan.",
+        },
+        gallery: [
+          "v1782485788/prod12_black_c_nqjzw6.jpg",
+          "v1782485789/prod12_white_c_cg7zrs.jpg",
+        ],
+      },
+      {
+        key: "rose-argent",
+        label: { fr: "Rose & Argent", ar: "زهري · فضي" },
+        img: "v1782498863/image_1782498828281_jnc8yf_kmfzqo.jpg",
+        desc: {
+          fr: "Rose poudré sur argent rhodié : la version la plus douce, très demandée en cadeau.",
+          ar: "زهري ناعم على الفضة: النسخة الأكثر هدوءًا، ومطلوبة بزاف كهدية.",
+        },
+        gallery: [
+          "v1782498863/image_1782498828281_jnc8yf_kmfzqo.jpg",
+          "v1782498863/image_1782498175677_w6b338_kjhxey.jpg",
+        ],
+      },
+      {
+        key: "argent-violet",
+        label: { fr: "Argent & Violet", ar: "فضي · بنفسجي" },
+        img: "v1782485781/prod6_whie_c_ne2gnl.jpg",
+        desc: {
+          fr: "Violet profond serti sur argent : élégant de jour comme en soirée.",
+          ar: "بنفسجي عميق مرصّع على الفضة: أنيق فالنهار وفالسهرة.",
+        },
+        gallery: [
+          "v1782485781/prod6_whie_c_ne2gnl.jpg",
+          "v1782146347/product_8_zydnr8.png",
+        ],
+      },
+      {
+        key: "rose",
+        label: { fr: "Rose", ar: "زهري" },
+        img: "v1782485766/prod2_white_C_gvnwin.jpg",
+        desc: {
+          fr: "Cristaux rosés en dégradé — le modèle le plus féminin de la gamme.",
+          ar: "كريستال زهري متدرج — الموديل الأكثر أنوثة فالمجموعة.",
+        },
+        gallery: ["v1782485766/prod2_white_C_gvnwin.jpg"],
+      },
     ],
     bundles: bundlesFor(139, 20, 30),
     usps: [
-      { fr: "Pendentif cygne sculpté", ar: "دلاية بجعة منحوتة" },
-      { fr: "Cristaux améthyste sur argent", ar: "كريستال أميتيست على الفضة" },
-      { fr: "Livraison gratuite au Maroc", ar: "توصيل مجاني فالمغرب" },
-      { fr: "Paiement à la livraison", ar: "الخلاص عند الاستلام" },
+      { fr: "6 coloris au même prix", ar: "6 ألوان بنفس الثمن" },
+      { fr: "Collier + bracelet en coffret", ar: "عقد + سوار فعلبة" },
+      { fr: "Argent rhodié, ne noircit pas", ar: "فضة ما كتسودش" },
+      { fr: "Livraison gratuite · paiement à la réception", ar: "توصيل مجاني · الخلاص عند الاستلام" },
     ],
     benefits: [
       {
         icon: "🦢",
         title: { fr: "Un pendentif, pas un simple pendentif", ar: "دلاية، ماشي غير دلاية" },
         desc: {
-          fr: "Le cygne est sculpté en volume, avec le cou et les ailes détaillés. C'est ce relief qui attire l'œil et déclenche la question « il vient d'où ? ».",
-          ar: "البجعة منحوتة بحجم كامل، بالعنق والجوانح مفصلين. هاد البروز هو اللي كيجبد العين وكيخلي الناس تسول «منين هادي؟».",
+          fr: "Le cygne est sculpté en volume, cou et ailes détaillés. C'est ce relief qui déclenche la question « il vient d'où ? ».",
+          ar: "البجعة منحوتة بحجم كامل، بالعنق والجوانح مفصلين. هاد البروز هو اللي كيخلي الناس تسول «منين هادي؟».",
         },
       },
-      {
-        icon: "💜",
-        title: { fr: "Le violet qui va aux peaux mates", ar: "البنفسجي اللي كيجي للبشرة القمحية" },
-        desc: {
-          fr: "L'améthyste sur base argentée est l'une des rares associations qui met en valeur les carnations mates sans les éteindre.",
-          ar: "الأميتيست على قاعدة فضية من قلال التركيبات اللي كتبرز البشرة القمحية بلا ما تطفيها.",
-        },
-      },
-      ...BENEFITS_BASE.slice(0, 2),
+      ...BENEFITS_BASE.slice(0, 3),
     ],
     included: [
       { fr: "1 collier avec pendentif cygne", ar: "عقد بدلاية البجعة" },
@@ -639,10 +451,10 @@ export const PRODUCTS: LPProduct[] = [
       { fr: "1 chiffon de polissage offert", ar: "قطعة تلميع مجانية" },
     ],
     story: {
-      title: { fr: "Pourquoi le cygne", ar: "علاش البجعة" },
+      title: { fr: "Quel coloris Swan choisir ?", ar: "شنو اللون Swan اللي تختاري؟" },
       body: {
-        fr: "Le cygne est l'un des rares symboles universellement associés à la grâce et à la fidélité — c'est pour ça qu'il revient si souvent dans les cadeaux d'anniversaire et de fiançailles. Sur cette parure, il n'est pas décoratif : il est le point d'accroche du regard, posé au creux du cou, entouré de cristaux améthyste qui l'encadrent sans lui voler la vedette. C'est ce qui distingue l'Ensemble Swan d'une parure classique : on ne remarque pas d'abord les pierres, on remarque le motif. Et un motif, ça se retient.",
-        ar: "البجعة من قلال الرموز المرتبطة عالميًا بالرشاقة والوفاء — وعلاش كتجي بزاف فهدايا عيد الميلاد والخطوبة. فهاد الطقم، ماشي غير للزينة: هي نقطة اللي كتجبد العين، محطوطة فوسط العنق، محاطة بكريستال الأميتيست اللي كيأطرها بلا ما يسرق منها الأضواء.",
+        fr: "Les six coloris partagent la même fabrication : argent rhodié ou monture dorée, pendentif cygne sculpté en volume, bracelet assorti, coffret inclus. Seule la teinte des cristaux change, et le prix reste identique. Le Blanc est le plus offert — sur dix commandes, sept partent en cadeau, parce que le cristal transparent ne dépend ni du teint, ni de la garde-robe, ni de l'âge. L'Améthyste et l'Argent & Violet sont les choix « pour soi » : le violet ressort sur les peaux mates. Le Rose et le Rose & Argent sont les plus doux, très demandés pour un anniversaire. Le Noir & Doré offre le contraste le plus marqué de la gamme. Si vous hésitez, prenez le Blanc : c'est celui qui se porte le plus souvent.",
+        ar: "الستة ألوان عندهم نفس الصناعة: فضة ولا قاعدة ذهبية، دلاية بجعة منحوتة، سوار متناسق، والعلبة داخلة. غير لون الكريستال هو اللي كيتبدل، والثمن كيبقى نفسو. الأبيض هو الأكثر إهداءً — من كل 10 طلبيات، 7 كيمشيو هدية، حيت الكريستال الشفاف ما كيعتمدش على لون البشرة ولا على الملابس ولا على العمر. الأميتيست والفضي · بنفسجي هوما الاختيار «ليك»: البنفسجي كيبان على البشرة القمحية. الزهري والزهري · فضي هوما الأنعم، ومطلوبين بزاف لعيد الميلاد. الأسود · ذهبي عندو أقوى تباين فالمجموعة. إلى حتارتي، خدي الأبيض.",
       },
     },
     specs: [
@@ -653,103 +465,22 @@ export const PRODUCTS: LPProduct[] = [
     faq: FAQ_BASE,
     reviews: [
       rev("Soukaina R.", "سكينة ر.", "Casablanca", "الدار البيضاء", "Le cygne est vraiment détaillé, on le voit bien. Ma collègue m'a demandé le lien direct 😄", "البجعة مفصلة بصح، كتبان مزيان. صاحبتي فالخدمة طلبات مني اللينك ديريكت 😄", 2),
-      rev("Fadwa L.", "فدوى ل.", "Rabat", "الرباط", "Je l'ai commandé pour l'anniversaire de ma sœur, elle a pleuré 🥹 Le coffret aide beaucoup.", "طلبتو لعيد ميلاد ختي، بكات 🥹 العلبة عاونات بزاف.", 6),
-      rev("Aya B.", "آية ب.", "Marrakech", "مراكش", "Le violet est magnifique sur la peau mate. Je confirme ce qui est écrit.", "البنفسجي زوين بزاف على البشرة القمحية. كنأكد اللي مكتوب.", 12),
+      rev("Fadwa L.", "فدوى ل.", "Rabat", "الرباط", "Commandé le blanc pour l'anniversaire de ma sœur, elle a pleuré 🥹 Le coffret aide beaucoup.", "طلبت الأبيض لعيد ميلاد ختي، بكات 🥹 العلبة عاونات بزاف.", 6),
+      rev("Aya B.", "آية ب.", "Marrakech", "مراكش", "L'améthyste est magnifique sur la peau mate. Je confirme ce qui est écrit.", "الأميتيست زوين بزاف على البشرة القمحية. كنأكد اللي مكتوب.", 12),
       rev("Latifa H.", "لطيفة ح.", "Meknès", "مكناس", "Reçu en 48h, tout conforme, payé sur place. Rien à redire.", "وصلني ف48 ساعة، كلشي مطابق، خلصت فبلاصتي. ما عندي ما نقول.", 15),
-      rev("Chaima N.", "شيماء ن.", "Oujda", "وجدة", "3ème commande, jamais déçue. Cette fois j'ai pris le pack de 2.", "ثالث طلبية، عمري ما تخيبت. هاد المرة خديت باك ديال 2.", 19),
-      rev("Ilham T.", "إلهام ت.", "Kénitra", "القنيطرة", "Très joli, mais je pensais que le pendentif serait un peu plus grand. Ça reste très beau.", "زوين بزاف، ولكن كنت كنضن الدلاية غادي تكون شوية كبيرة. ولكن يبقى زوين.", 24, 4),
+      rev("Zahra A.", "زهرة أ.", "Tanger", "طنجة", "Ma fille de 16 ans porte le blanc tous les jours, aucune allergie. C'est ce qui m'importait.", "بنتي عندها 16 عام كتلبس الأبيض كل نهار، بلا حساسية. وهادشي هو اللي كان يهمني.", 20),
+      rev("Chaima N.", "شيماء ن.", "Oujda", "وجدة", "3ème commande, jamais déçue. Cette fois j'ai pris le pack de 2, un de chaque.", "ثالث طلبية، عمري ما تخيبت. هاد المرة خديت باك ديال 2، وحدة من كل نوع.", 25),
     ],
-    upsell: "parure-swan-blanc",
+    upsell: "parure-tulip",
     seo: {
-      title: "Ensemble Swan Améthyste 🦢 Collier Pendentif Cygne | Maison d'Or",
+      title: "Ensemble Swan 🦢 Collier Pendentif Cygne — 6 coloris, 139 dh | Maison d'Or",
       description:
-        "Parure Swan : collier pendentif cygne + bracelet en cristaux améthyste sur argent rhodié. Ne ternit pas, hypoallergénique. Livraison gratuite au Maroc, paiement à la livraison.",
+        "Parure Swan : collier à pendentif cygne + bracelet assorti, 6 coloris au choix. Ne ternit pas, hypoallergénique. Livraison gratuite au Maroc, paiement à la livraison.",
     },
   },
-
-  /* ── 7. SWAN BLANC ────────────────────────────────────── */
-  {
-    slug: "parure-swan-blanc",
-    id: "swan-blanc",
-    type: "Swan",
-    emoji: "🕊️",
-    name: { fr: "Ensemble Swan Blanc", ar: "طقم Swan الأبيض" },
-    category: { fr: "Parures Swan", ar: "أطقم Swan" },
-    headline: {
-      fr: "La version pure du cygne — celle qu'on offre",
-      ar: "النسخة الصافية ديال البجعة — اللي كتنهدى",
-    },
-    subheadline: {
-      fr: "Cristaux transparents et pendentif cygne en argent rhodié. Le cadeau qui ne prend aucun risque : il va à toutes les tenues, à tous les âges, à toutes les occasions.",
-      ar: "كريستال شفاف ودلاية بجعة فضية. الهدية اللي ما فيها خطر: كتمشي مع كل الملابس، كل الأعمار، وكل المناسبات.",
-    },
-    price: 139,
-    compareAt: 199,
-    rating: 4.9,
-    reviewCount: 108,
-    stock: 9,
-    hero: "v1782146354/product_9_d9gry9.png",
-    gallery: [
-      "v1782146354/product_9_d9gry9.png",
-      "v1782146355/product_10_gebr70.png",
-    ],
-    variants: [
-      { key: "blanc", label: { fr: "Argenté · Blanc", ar: "فضي · أبيض" }, img: "v1782146354/product_9_d9gry9.png" },
-    ],
-    bundles: bundlesFor(139, 20, 30),
-    usps: [
-      { fr: "Le cadeau qui plaît à coup sûr", ar: "الهدية اللي كتعجب ديما" },
-      { fr: "Pendentif cygne + cristaux clairs", ar: "دلاية بجعة + كريستال شفاف" },
-      { fr: "Coffret cadeau inclus", ar: "علبة هدية مجانية" },
-      { fr: "Paiement à la livraison", ar: "الخلاص عند الاستلام" },
-    ],
-    benefits: [
-      {
-        icon: "🎀",
-        title: { fr: "Le cadeau sans risque de se tromper", ar: "الهدية بلا خطر ديال الغلط" },
-        desc: {
-          fr: "Blanc et argent : aucune couleur à deviner, aucune taille à demander. C'est le cadeau que vous pouvez commander sans poser de questions à la personne.",
-          ar: "أبيض وفضي: بلا لون خاصك تخمن، بلا قياس خاصك تسول. هادي هي الهدية اللي تقدر تطلبها بلا ما تسول الشخص.",
-        },
-      },
-      ...BENEFITS_BASE.slice(0, 3),
-    ],
-    included: [
-      { fr: "1 collier avec pendentif cygne", ar: "عقد بدلاية البجعة" },
-      { fr: "1 bracelet assorti", ar: "سوار متناسق" },
-      { fr: "1 coffret cadeau Maison d'Or", ar: "علبة هدية Maison d'Or" },
-      { fr: "1 chiffon de polissage offert", ar: "قطعة تلميع مجانية" },
-    ],
-    story: {
-      title: { fr: "Le modèle le plus offert de la collection", ar: "الموديل الأكثر إهداءً فالمجموعة" },
-      body: {
-        fr: "Sur dix Ensembles Swan Blanc commandés, sept partent en cadeau. La raison est pratique autant qu'esthétique : le blanc et l'argent ne dépendent ni du teint, ni de la garde-robe, ni de l'âge de la personne. Une lycéenne, une jeune mariée et une mère de famille peuvent porter exactement la même pièce sans que ça détonne. Ajoutez le coffret Maison d'Or fourni et vous avez un cadeau prêt à offrir, livré chez vous en 24 à 72h, payé à la réception. C'est pour cette raison que ce modèle est notre plus gros volume à l'approche de l'Aïd et de la rentrée.",
-        ar: "من كل 10 أطقم Swan أبيض مطلوبة، 7 كيمشيو هدية. السبب عملي بحال ما هو جمالي: الأبيض والفضي ما كيعتمدوش على لون البشرة، ولا على الملابس، ولا على العمر. تلميذة، عروسة جديدة، وأم ديال دار يقدرو يلبسو نفس القطعة بلا مشكل. زيد العلبة ديال Maison d'Or وعندك هدية جاهزة، كتوصلك ف24 ل72 ساعة، وكتخلص عند الاستلام.",
-      },
-    },
-    specs: [
-      { label: { fr: "Matière", ar: "المادة" }, value: { fr: "Acier inoxydable rhodié argent", ar: "فولاذ مقاوم للصدأ مطلي بالفضة" } },
-      { label: { fr: "Motif", ar: "التصميم" }, value: { fr: "Pendentif cygne sculpté en volume", ar: "دلاية بجعة منحوتة" } },
-      ...SPECS_ACIER.slice(2),
-    ],
-    faq: FAQ_BASE,
-    reviews: [
-      rev("Hanane B.", "حنان ب.", "Casablanca", "الدار البيضاء", "Offert à ma nièce pour sa réussite au bac, elle l'a mis direct. Coffret très propre.", "أهديتو لبنت ختي على نجاحها فالباك، لبساتو ديريكت. العلبة نقية بزاف.", 4),
-      rev("Siham D.", "سهام د.", "Rabat", "الرباط", "Simple, propre, ça brille bien. Pour 139 dh avec livraison gratuite c'est correct.", "بسيط، نقي، وكيبرق مزيان. ب139 درهم مع التوصيل المجاني، معقول.", 8),
-      rev("Wafa M.", "وفاء م.", "Tanger", "طنجة", "Je l'ai pris pour moi finalement 😂 le cygne est trop mignon.", "خديتو ليا أنا فالأخير 😂 البجعة زوينة بزاف.", 13),
-      rev("Naima F.", "نعيمة ف.", "Safi", "آسفي", "Livraison en 3 jours à Safi, le livreur a appelé avant. Service correct.", "التوصيل ف3 أيام لآسفي، الموصّل عيط قبل. خدمة مزيانة.", 17),
-      rev("Zahra A.", "زهرة أ.", "Marrakech", "مراكش", "Ma fille de 16 ans le porte tous les jours, aucune allergie. C'est ce qui m'importait.", "بنتي عندها 16 عام كتلبسو كل نهار، بلا حساسية. وهادشي هو اللي كان يهمني.", 22),
-      rev("Sabrine K.", "صبرين ك.", "Nador", "الناظور", "Bien reçu, joli. Juste la chaîne du bracelet un peu fine mais ça va.", "توصلت، زوين. غير السلسلة ديال السوار شوية رقيقة ولكن لاباس.", 26, 4),
-    ],
-    upsell: "parure-tulip-bicolore",
-    seo: {
-      title: "Ensemble Swan Blanc 🕊️ Collier Cygne Cristal | Maison d'Or",
-      description:
-        "Parure Swan Blanc : collier pendentif cygne + bracelet en cristaux transparents sur argent rhodié. Cadeau idéal, coffret inclus. Livraison gratuite au Maroc, paiement à la livraison.",
-    },
-  },
-
-  /* ── 8. BRACELETS TULIP ───────────────────────────────── */
+  /* ═══════════════════════════════════════════════════════
+     3. BRACELET TULIP — 7 coloris
+     ═══════════════════════════════════════════════════════ */
   {
     slug: "bracelet-tulip",
     id: "tulip-bracelets",
@@ -848,7 +579,7 @@ export const PRODUCTS: LPProduct[] = [
       rev("Hiba L.", "هبة ل.", "Tétouan", "تطوان", "Pack de 2 partagé avec ma copine, ça revient à rien. On les porte tous les jours.", "باك ديال 2 قسمتو مع صاحبتي، ما كيسوى والو. كنلبسوهم كل نهار.", 18),
       rev("Meriem K.", "مريم ك.", "Marrakech", "مراكش", "Bien mais la chaîne d'extension est courte pour les gros poignets. À voir.", "مزيان ولكن سلسلة التمديد قصيرة لليدين الكبار. خاص تشوفو.", 25, 4),
     ],
-    upsell: "parure-tulip-bicolore",
+    upsell: "parure-tulip",
     seo: {
       title: "Bracelet Tulip 🌸 7 coloris — 99 dh | Maison d'Or",
       description:
@@ -864,10 +595,21 @@ export const PRODUCTS: LPProduct[] = [
 export const getProduct = (slug: string) => PRODUCTS.find((p) => p.slug === slug);
 export const getAllSlugs = () => PRODUCTS.map((p) => p.slug);
 
-/** Redirections des anciennes URLs d'annonces vers les nouvelles LP */
+/** Photos affichées pour la variante sélectionnée (galerie propre, sinon celle du produit). */
+export const variantGallery = (product: LPProduct, variant: Variant) =>
+  Array.from(new Set([variant.img, ...(variant.gallery ?? product.gallery)]));
+
+/** Anciennes URLs (annonces déjà lancées) → LP actuelle. */
 export const LEGACY_REDIRECTS: Record<string, string> = {
-  swan: "parure-swan-noir",
-  tulip: "parure-tulip-bicolore",
+  swan: "parure-swan",
+  tulip: "parure-tulip",
+  "parure-swan-noir": "parure-swan",
+  "parure-swan-blanc": "parure-swan",
+  "parure-tulip-bicolore": "parure-tulip",
+  "parure-tulip-prestige": "parure-tulip",
+  "parure-tulip-doree": "parure-tulip",
+  "parure-tulip-argentee": "parure-tulip",
+  "parure-tulip-rouge": "parure-tulip",
 };
 
 export const bundleTotal = (b: Bundle) => b.unit * b.qty;
