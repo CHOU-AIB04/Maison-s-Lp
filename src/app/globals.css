@@ -67,3 +67,26 @@ body {
   border-color: var(--gold);
   box-shadow: 0 0 0 3px rgba(201, 162, 75, 0.18);
 }
+
+/* Bandeau d'annonces défilant */
+@keyframes tickerScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.ticker {
+  animation: tickerScroll 28s linear infinite;
+}
+[dir="rtl"] .ticker {
+  animation-direction: reverse;
+}
+
+/* Accordéon FAQ */
+details > summary { list-style: none; }
+details[open] > summary { color: var(--gold-dark); }
+
+/* Sélecteur de pack : fond doré léger */
+.bg-\[var\(--gold\)\]\/8 { background-color: rgba(201, 162, 75, 0.08); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker, .cta-pulse, .fade-up { animation: none; }
+}

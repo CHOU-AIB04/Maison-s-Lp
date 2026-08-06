@@ -1,24 +1,170 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
+import { FORCELOG_CITIES } from "@/lib/cities";
+import { buildOrderEmailHtml, type EmailItem } from "@/lib/order-email";
+import { pushNtfy } from "@/lib/notify";
 
 export const runtime = "nodejs";
+
+/* ─────────────────────────────────────────────
+   Payload envoyé par la landing page
+   ───────────────────────────────────────────── */
+type OrderItem = {
+  name: string;
+  variant: string;
+  quantity: number;
+  price: number;
+  image: string;
+};
 
 type OrderPayload = {
   name?: string;
   phone?: string;
-  city?: string;
-  color?: string;
-  qty?: number;
-  price?: number;
-  delivery?: number | null;
+  cityCode?: string;
+  address?: string;
+  items?: OrderItem[];
   subtotal?: number;
   discount?: number;
+  shipping?: number;
   total?: number;
   product?: string;
   model?: string;
+  variant?: string;
+  qty?: number;
   lang?: string;
+  source?: string;
 };
 
+const EMAIL_TO = (process.env.ORDER_EMAIL_TO || "chouaibalx@gmail.com,m.eladraouy@gmail.com")
+  .split(",")
+  .map((t) => t.trim())
+  .filter(Boolean);
+
+/* ─────────────────────────────────────────────
+   1. Forcelog — création du colis
+   ───────────────────────────────────────────── */
+async function createForcelogParcel(args: {
+  orderNum: string;
+  name: string;
+  phone: string;
+  cityCode: string;
+  address: string;
+  total: number;
+  items: OrderItem[];
+}) {
+  if (!process.env.FORCELOG_API_KEY) {
+    console.warn("FORCELOG_API_KEY manquant — colis non créé");
+    return { ok: false, skipped: true };
+  }
+
+  const comment = args.items
+    .map((i) => `${i.name} (${i.variant}) x${i.quantity}`)
+    .join(" | ");
+  const productNature = args.items.map((i) => i.name).join(", ");
+
+  const payload = {
+    ORDER_NUM: args.orderNum.slice(0, 20),
+    RECEIVER: args.name.slice(0, 50),
+    PHONE: args.phone.slice(0, 14),
+    CITY: args.cityCode.slice(0, 50),
+    ADDRESS: args.address.slice(0, 100),
+    COMMENT: comment.slice(0, 100),
+    PRODUCT_NATURE: productNature.slice(0, 100),
+    COD: args.total,
+    CAN_OPEN: true,
+    FRAGILE: false,
+  };
+
+  const res = await fetch("https://api.forcelog.ma/customer/Parcels/AddParcel", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-API-Key": process.env.FORCELOG_API_KEY,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const details = await res.text();
+    console.error("Forcelog error:", res.status, details);
+    return { ok: false, status: res.status, details };
+  }
+
+  return { ok: true, data: await res.json() };
+}
+
+/* ─────────────────────────────────────────────
+   3. Resend — email de commande
+   ───────────────────────────────────────────── */
+async function sendOrderEmail(args: {
+  orderNum: string;
+  name: string;
+  phone: string;
+  address: string;
+  cityName: string;
+  items: EmailItem[];
+  subtotal: number;
+  discount: number;
+  shipping: number;
+  total: number;
+  source: string;
+}) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY manquant — email non envoyé");
+    return;
+  }
+
+  const html = buildOrderEmailHtml({
+    orderNum: args.orderNum,
+    customerName: args.name,
+    phone: args.phone,
+    address: args.address,
+    cityName: args.cityName,
+    items: args.items,
+    subtotal: args.subtotal,
+    discount: args.discount,
+    shipping: args.shipping,
+    total: args.total,
+    source: args.source,
+  });
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: process.env.ORDER_EMAIL_FROM || "Maison d'Or <commandes@maison-dor.store>",
+      to: EMAIL_TO,
+      subject: `🛒 Commande LP ${args.orderNum} — ${args.name} (${args.total} MAD)`,
+      html,
+    }),
+  });
+
+  if (!res.ok) console.error("Resend error:", await res.text());
+}
+
+/* ─────────────────────────────────────────────
+   4. Vercel Blob — journal des commandes
+   ───────────────────────────────────────────── */
+async function logToBlob(row: Record<string, unknown>) {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    console.log("ORDER (blob non configuré):", row);
+    return;
+  }
+  const key = `orders/${Date.now()}-${Math.floor(Math.random() * 1e6)}.json`;
+  await put(key, JSON.stringify(row), {
+    access: "public",
+    contentType: "application/json",
+    token: process.env.BLOB_READ_WRITE_TOKEN,
+    addRandomSuffix: false,
+  });
+}
+
+/* ─────────────────────────────────────────────
+   Route
+   ───────────────────────────────────────────── */
 export async function POST(req: NextRequest) {
   let body: OrderPayload;
   try {
@@ -29,64 +175,110 @@ export async function POST(req: NextRequest) {
 
   const name = (body.name || "").trim();
   const phone = (body.phone || "").replace(/\s+/g, "");
-  const city = (body.city || "").trim();
+  const cityCode = (body.cityCode || "").trim();
+  const address = (body.address || "").trim();
 
-  if (!name || !phone || !city) {
+  if (!name || !phone || !cityCode) {
     return NextResponse.json({ ok: false, error: "missing_fields" }, { status: 422 });
   }
-  // tel marocain : 06/07 + 10 chiffres, ou +212
+
+  // Téléphone marocain : 05/06/07 + 8 chiffres, ou +212
   const normalized = phone.replace(/^\+?212/, "0");
-  if (!/^0[67]\d{8}$/.test(normalized)) {
+  if (!/^0[567]\d{8}$/.test(normalized)) {
     return NextResponse.json({ ok: false, error: "bad_phone" }, { status: 422 });
   }
 
+  const city = FORCELOG_CITIES.find((c) => c.code === cityCode);
+  if (!city) {
+    return NextResponse.json({ ok: false, error: "bad_city" }, { status: 422 });
+  }
+
+  const items: OrderItem[] =
+    body.items && body.items.length
+      ? body.items
+      : [
+          {
+            name: body.product || "Maison d'Or",
+            variant: body.variant || "",
+            quantity: body.qty || 1,
+            price: body.total || 0,
+            image: "",
+          },
+        ];
+
+  const orderNum = `MDO-LP-${Date.now()}`.slice(0, 20);
+  const subtotal = body.subtotal ?? items.reduce((s, i) => s + i.price * i.quantity, 0);
+  const discount = body.discount ?? 0;
+  const shipping = body.shipping ?? 0;
+  const total = body.total ?? subtotal - discount + shipping;
+  const source = body.source || body.model || "LP";
+
   const row = {
     date: new Date().toISOString(),
+    orderNum,
     name,
     phone: normalized,
-    city,
-    color: body.color || "",
-    qty: body.qty || 1,
-    price: body.price || 0,
-    delivery: body.delivery ?? 0,
-    subtotal: body.subtotal || 0,
-    discount: body.discount || 0,
-    total: body.total || 0,
-    product: body.product || "Ensemble Swan",
-    model: body.model || "swan",
-    lang: body.lang || "ar",
+    cityCode,
+    city: city.name,
+    address,
+    product: body.product || items[0]?.name || "",
+    model: body.model || "",
+    variant: body.variant || items[0]?.variant || "",
+    color: body.variant || items[0]?.variant || "",
+    qty: body.qty ?? items.reduce((s, i) => s + i.quantity, 0),
+    price: items[0]?.price ?? 0,
+    subtotal,
+    discount,
+    delivery: shipping,
+    shipping,
+    total,
+    lang: body.lang || "fr",
+    source,
   };
 
-  // Stockage principal : Vercel Blob (append-only, 1 fichier par commande)
-  try {
-    const key = `orders/${Date.now()}-${Math.floor(Math.random() * 1e6)}.json`;
-    await put(key, JSON.stringify(row), {
-      access: "public",
-      contentType: "application/json",
-      token: process.env.BLOB_READ_WRITE_TOKEN,
-      addRandomSuffix: false,
-    });
-  } catch (e) {
-    console.error("blob store failed", e);
-    return NextResponse.json({ ok: false, error: "store_failed" }, { status: 500 });
+  // ── Forcelog : bloquant (si ça échoue, on n'annonce pas la commande comme prise)
+  const forcelog = await createForcelogParcel({
+    orderNum,
+    name,
+    phone: normalized,
+    cityCode,
+    address: address || city.name,
+    total,
+    items,
+  });
+
+  // ── Notifications & journal : non bloquants
+  await Promise.allSettled([
+    pushNtfy({
+      orderNum,
+      name,
+      phone: normalized,
+      cityName: city.name,
+      total,
+      items,
+      image: items[0]?.image || "",
+      source,
+    }),
+    sendOrderEmail({
+      orderNum,
+      name,
+      phone: normalized,
+      address: address || city.name,
+      cityName: city.name,
+      items,
+      subtotal,
+      discount,
+      shipping,
+      total,
+      source,
+    }),
+    logToBlob({ ...row, forcelog: forcelog.ok }),
+  ]);
+
+  if (!forcelog.ok && !forcelog.skipped) {
+    // Le colis n'est pas créé mais la commande est notifiée : on la considère reçue.
+    return NextResponse.json({ ok: true, orderNum, forcelog: false });
   }
 
-  // Optionnel : miroir vers un webhook Sheet si configuré
-  const webhook = process.env.SHEET_WEBHOOK_URL;
-  if (webhook) {
-    try {
-      await fetch(webhook, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(row),
-      });
-    } catch (e) {
-      // on ne bloque pas la commande si le sheet échoue
-      console.error("sheet webhook failed", e);
-    }
-  } else {
-    console.log("ORDER (no webhook set):", row);
-  }
-
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, orderNum, forcelog: forcelog.ok });
 }

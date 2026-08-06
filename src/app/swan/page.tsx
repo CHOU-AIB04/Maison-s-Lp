@@ -1,4 +1,4 @@
-import ModelLP from "@/components/ModelLP";
-import { SWAN } from "@/lib/models";
-export const metadata = { title: "Ensemble Swan 🦢 - Collier + Bracelet | Maison d'Or" };
-export default function Page() { return <ModelLP model={SWAN} />; }
+import { redirect } from "next/navigation";
+export default function Page() {
+  redirect("/parure-swan-noir");
+}

@@ -4,6 +4,7 @@ import { Cairo, Tajawal, Cormorant_Garamond, Jost } from "next/font/google";
 import "./globals.css";
 
 const META_PIXEL_ID = "36659330483710557";
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://lp-maison-dor.vercel.app";
 
 // Polices du site maison-dor.store : Cormorant Garamond (titres) + Jost (texte)
 const cormorant = Cormorant_Garamond({
@@ -35,29 +36,21 @@ const tajawal = Tajawal({
   display: "swap",
 });
 
-const SITE = "https://lp-maison-dor.vercel.app";
-
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
-  title: "Ensemble Swan 🦢 - Collier + Bracelet | Maison d'Or",
-  description:
-    "Ensemble Swan : collier + bracelet plaqué or, design élégant. Paiement à la réception, livraison partout au Maroc. Commandez maintenant.",
-  openGraph: {
-    title: "Ensemble Swan 🦢 - Maison d'Or",
-    description:
-      "Collier + bracelet plaqué or. Paiement à la réception, livraison partout au Maroc.",
-    type: "website",
-    locale: "ar_MA",
-    url: SITE,
+  title: {
+    default: "Maison d'Or — Parures & Bracelets, livraison gratuite au Maroc",
+    template: "%s",
   },
+  description:
+    "Parures Tulip et Swan en plaqué or 18K et argent rhodié. Livraison gratuite partout au Maroc, paiement à la livraison.",
   robots: { index: true, follow: true },
+  icons: { icon: "/favicon.ico" },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ar" dir="rtl">
+    <html lang="fr" dir="ltr">
       <head>
         <Script id="meta-pixel" strategy="afterInteractive">
           {`!function(f,b,e,v,n,t,s)
@@ -72,7 +65,9 @@ export default function RootLayout({
           fbq('track', 'PageView');`}
         </Script>
       </head>
-      <body className={`${cormorant.variable} ${jost.variable} ${cairo.variable} ${tajawal.variable} min-h-full antialiased`}>
+      <body
+        className={`${cormorant.variable} ${jost.variable} ${cairo.variable} ${tajawal.variable} min-h-full antialiased`}
+      >
         <noscript>
           <img
             height="1"
