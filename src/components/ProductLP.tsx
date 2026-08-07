@@ -14,6 +14,7 @@ import {
   variantGallery,
 } from "@/lib/catalog";
 import { UI } from "@/lib/ui-copy";
+import { gtmEvent, type GtmItem } from "@/lib/gtm";
 import { FORCELOG_CITIES } from "@/lib/cities";
 
 type Status = "idle" | "sending" | "done";
@@ -131,7 +132,21 @@ export default function ProductLP({ product }: { product: LPProduct }) {
       value: product.price,
       currency: "MAD",
     });
+    gtmEvent("view_item", { currency: "MAD", value: product.price, items: gtmItems(1) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product.id, product.name.fr, product.price]);
+
+  /** Items au format GA4 (identique au site principal). */
+  const gtmItems = (quantity = qty, price = product.price): GtmItem[] => [
+    {
+      item_id: product.id,
+      item_name: product.name.fr,
+      item_variant: variant.label.fr,
+      item_category: product.category.fr,
+      price,
+      quantity,
+    },
+  ];
 
   const startCheckout = () => {
     if (checkoutStarted.current) return;
@@ -143,6 +158,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
       currency: "MAD",
       num_items: qty,
     });
+    gtmEvent("begin_checkout", { currency: "MAD", value: total, items: gtmItems() });
   };
 
   const goToForm = () => {
@@ -153,6 +169,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
       currency: "MAD",
       num_items: qty,
     });
+    gtmEvent("add_to_cart", { currency: "MAD", value: total, items: gtmItems() });
     document.getElementById("commander")?.scrollIntoView({ behavior: "smooth", block: "center" });
     setTimeout(() => document.getElementById("f-name")?.focus(), 500);
   };
@@ -225,6 +242,13 @@ export default function ProductLP({ product }: { product: LPProduct }) {
         currency: "MAD",
         num_items: qty,
       });
+      gtmEvent("purchase", {
+        transaction_id: json.orderNum || `MDO-${Date.now()}`,
+        currency: "MAD",
+        value: total,
+        shipping: 0,
+        items: gtmItems(),
+      });
       setStatus("done");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
@@ -280,6 +304,22 @@ export default function ProductLP({ product }: { product: LPProduct }) {
         value: upsellPrice,
         currency: "MAD",
         num_items: 1,
+      });
+      gtmEvent("purchase", {
+        transaction_id: `${json.orderNum || Date.now()}-UPSELL`,
+        currency: "MAD",
+        value: upsellPrice,
+        shipping: 0,
+        items: [
+          {
+            item_id: upsellProduct.id,
+            item_name: `${upsellProduct.name.fr} (UPSELL -50%)`,
+            item_variant: upsellProduct.variants[0].label.fr,
+            item_category: upsellProduct.category.fr,
+            price: upsellPrice,
+            quantity: 1,
+          },
+        ],
       });
       setUpsellState("added");
     } catch {
