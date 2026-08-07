@@ -15,6 +15,8 @@ type Order = {
   product: string;
   model?: string;
   lang: string;
+  utmSource?: string;
+  utmContent?: string;
 };
 
 function Dashboard() {
@@ -77,7 +79,7 @@ function Dashboard() {
             <thead className="bg-[var(--cream)] text-left">
               <tr className="text-[#6b6353]">
                 <th className="p-3">Date</th><th className="p-3">Nom</th><th className="p-3">Téléphone</th>
-                <th className="p-3">Modèle</th><th className="p-3">Ville</th><th className="p-3">Couleur</th><th className="p-3">Qté</th><th className="p-3">Total</th>
+                <th className="p-3">Modèle</th><th className="p-3">Ville</th><th className="p-3">Couleur</th><th className="p-3">Qté</th><th className="p-3">Total</th><th className="p-3">Source</th><th className="p-3">Créa</th>
               </tr>
             </thead>
             <tbody>
@@ -91,6 +93,8 @@ function Dashboard() {
                   <td className="p-3">{o.color}</td>
                   <td className="p-3 text-center">{o.qty}</td>
                   <td className="p-3 font-bold">{o.total} DH</td>
+                  <td className="p-3 text-xs text-[#8a8172]">{o.utmSource || "—"}</td>
+                  <td className="p-3 text-xs text-[#8a8172]">{o.utmContent || "—"}</td>
                 </tr>
               ))}
             </tbody>

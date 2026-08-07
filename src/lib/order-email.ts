@@ -23,6 +23,8 @@ export type EmailPayload = {
   shipping: number;
   total: number;
   source: string;
+  utmSource?: string;
+  utmContent?: string;
 };
 
 export function buildOrderEmailHtml(data: EmailPayload): string {
@@ -87,6 +89,15 @@ export function buildOrderEmailHtml(data: EmailPayload): string {
               <p style="margin:0 0 4px; font-family:Arial,sans-serif; font-size:11px; color:#8C7B6A; letter-spacing:0.2em; text-transform:uppercase;">Référence</p>
               <p style="margin:0; font-family:'Georgia',serif; font-size:20px; font-weight:700; color:${dark};">${data.orderNum}</p>
             </div>
+            ${
+              data.utmSource || data.utmContent
+                ? `<p style="margin:0 0 14px; font-family:Arial,sans-serif; font-size:12px; color:#8C7B6A;">
+                     📣 ${data.utmSource ? `Source : <strong style="color:${dark};">${data.utmSource}</strong>` : ""}
+                     ${data.utmSource && data.utmContent ? " · " : ""}
+                     ${data.utmContent ? `Créa : <strong style="color:${dark};">${data.utmContent}</strong>` : ""}
+                   </p>`
+                : ""
+            }
             <table cellpadding="0" cellspacing="0" style="margin:0 auto; background:#FFF8EC; border:1px solid #E8D5A3; border-radius:6px;">
               <tr>
                 <td style="padding:10px 16px; text-align:center;"><p style="margin:0; font-family:Arial,sans-serif; font-size:13px; color:#7A5C1E; font-weight:600;">👤 ${data.customerName}</p></td>

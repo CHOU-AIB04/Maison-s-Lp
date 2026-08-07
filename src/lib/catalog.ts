@@ -187,7 +187,7 @@ export const PRODUCTS: LPProduct[] = [
      1. ENSEMBLE TULIP — 5 modèles réunis sur une seule LP
      ═══════════════════════════════════════════════════════ */
   {
-    slug: "parure-tulip",
+    slug: "ensemble-tulip",
     id: "tulip",
     type: "Tulip",
     emoji: "🌷",
@@ -317,7 +317,7 @@ export const PRODUCTS: LPProduct[] = [
       rev("Kenza M.", "كنزة م.", "Tanger", "طنجة", "La Rouge sur un caftan blanc, effet garanti. Le rouge est vraiment profond, pas orange.", "الأحمر على قفطان أبيض، النتيجة مضمونة. الأحمر عميق بصح، ماشي برتقالي.", 16),
       rev("Amal S.", "أمل س.", "Agadir", "أكادير", "Pack de 2 avec ma sœur : elle a pris la Prestige, moi la Dorée. Livré ensemble, payé au livreur.", "باك ديال 2 مع ختي: هي خديت البرستيج وأنا الذهبي. وصلونا مع بعض، وخلصنا للموصّل.", 22),
     ],
-    upsell: "parure-swan",
+    upsell: "ensemble-swan",
     seo: {
       title: "Ensemble Tulip 🌷 Collier + Bracelet — 5 modèles, 139 dh | Maison d'Or",
       description:
@@ -329,7 +329,7 @@ export const PRODUCTS: LPProduct[] = [
      2. ENSEMBLE SWAN — 2 modèles réunis
      ═══════════════════════════════════════════════════════ */
   {
-    slug: "parure-swan",
+    slug: "ensemble-swan",
     id: "swan",
     type: "Swan",
     emoji: "🦢",
@@ -473,7 +473,7 @@ export const PRODUCTS: LPProduct[] = [
       rev("Zahra A.", "زهرة أ.", "Tanger", "طنجة", "Ma fille de 16 ans porte le blanc tous les jours, aucune allergie. C'est ce qui m'importait.", "بنتي عندها 16 عام كتلبس الأبيض كل نهار، بلا حساسية. وهادشي هو اللي كان يهمني.", 20),
       rev("Chaima N.", "شيماء ن.", "Oujda", "وجدة", "3ème commande, jamais déçue. Cette fois j'ai pris le pack de 2, un de chaque.", "ثالث طلبية، عمري ما تخيبت. هاد المرة خديت باك ديال 2، وحدة من كل نوع.", 25),
     ],
-    upsell: "parure-tulip",
+    upsell: "ensemble-tulip",
     seo: {
       title: "Ensemble Swan 🦢 Collier Pendentif Cygne — 6 coloris, 129 dh | Maison d'Or",
       description:
@@ -577,7 +577,7 @@ export const PRODUCTS: LPProduct[] = [
       rev("Hiba L.", "هبة ل.", "Tétouan", "تطوان", "Pack de 2 partagé avec ma copine, ça revient à rien. On les porte tous les jours.", "باك ديال 2 قسمتو مع صاحبتي، ما كيسوى والو. كنلبسوهم كل نهار.", 18),
       rev("Meriem K.", "مريم ك.", "Marrakech", "مراكش", "Bien mais la chaîne d'extension est courte pour les gros poignets. À voir.", "مزيان ولكن سلسلة التمديد قصيرة لليدين الكبار. خاص تشوفو.", 25, 4),
     ],
-    upsell: "parure-tulip",
+    upsell: "ensemble-tulip",
     seo: {
       title: "Bracelet Tulip 🌸 7 coloris — 99 dh | Maison d'Or",
       description:
@@ -599,15 +599,17 @@ export const variantGallery = (product: LPProduct, variant: Variant) =>
 
 /** Anciennes URLs (annonces déjà lancées) → LP actuelle. */
 export const LEGACY_REDIRECTS: Record<string, string> = {
-  swan: "parure-swan",
-  tulip: "parure-tulip",
-  "parure-swan-noir": "parure-swan",
-  "parure-swan-blanc": "parure-swan",
-  "parure-tulip-bicolore": "parure-tulip",
-  "parure-tulip-prestige": "parure-tulip",
-  "parure-tulip-doree": "parure-tulip",
-  "parure-tulip-argentee": "parure-tulip",
-  "parure-tulip-rouge": "parure-tulip",
+  swan: "ensemble-swan",
+  tulip: "ensemble-tulip",
+  "parure-swan": "ensemble-swan",
+  "parure-tulip": "ensemble-tulip",
+  "parure-swan-noir": "ensemble-swan",
+  "parure-swan-blanc": "ensemble-swan",
+  "parure-tulip-bicolore": "ensemble-tulip",
+  "parure-tulip-prestige": "ensemble-tulip",
+  "parure-tulip-doree": "ensemble-tulip",
+  "parure-tulip-argentee": "ensemble-tulip",
+  "parure-tulip-rouge": "ensemble-tulip",
 };
 
 export const bundleTotal = (b: Bundle) => b.total;

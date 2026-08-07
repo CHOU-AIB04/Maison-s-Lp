@@ -72,6 +72,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
   const [err, setErr] = useState("");
   const [orderNum, setOrderNum] = useState("");
   const [upsellState, setUpsellState] = useState<"offer" | "adding" | "added" | "declined">("offer");
+  const [utm, setUtm] = useState({ source: "", content: "" });
   const checkoutStarted = useRef(false);
 
   const selectedCity = FORCELOG_CITIES.find((c) => c.code === cityCode);
@@ -105,6 +106,21 @@ export default function ProductLP({ product }: { product: LPProduct }) {
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
+  }, []);
+
+  /** utm_source / utm_content : lus dans l'URL, conservés pour la session. */
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const pick = (key: string) => {
+      const fromUrl = q.get(key);
+      try {
+        if (fromUrl) sessionStorage.setItem(key, fromUrl);
+        return fromUrl ?? sessionStorage.getItem(key) ?? "";
+      } catch {
+        return fromUrl ?? "";
+      }
+    };
+    setUtm({ source: pick("utm_source"), content: pick("utm_content") });
   }, []);
 
   useEffect(() => {
@@ -193,6 +209,8 @@ export default function ProductLP({ product }: { product: LPProduct }) {
           qty,
           lang,
           source: product.slug,
+          utmSource: utm.source,
+          utmContent: utm.content,
         }),
       });
       const json = await res.json();
@@ -250,6 +268,8 @@ export default function ProductLP({ product }: { product: LPProduct }) {
           qty: 1,
           lang,
           source: `${product.slug}-upsell`,
+          utmSource: utm.source,
+          utmContent: utm.content,
         }),
       });
       const json = await res.json();
@@ -488,6 +508,9 @@ export default function ProductLP({ product }: { product: LPProduct }) {
               <p className="text-center text-sm font-bold text-[#4a4436]">
                 💵 {t.formTitle} — {t.cod}
               </p>
+
+              <input type="hidden" name="utm_source" value={utm.source} readOnly />
+              <input type="hidden" name="utm_content" value={utm.content} readOnly />
 
               <input id="f-name" className="field" placeholder={t.fName} value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
               <input className="field" type="tel" inputMode="tel" placeholder={t.fPhone} value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" />

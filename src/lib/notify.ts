@@ -23,12 +23,21 @@ export async function pushNtfy(args: {
   items: NtfyItem[];
   image: string;
   source: string;
+  utmSource?: string;
+  utmContent?: string;
 }) {
   const itemsList = args.items
     .map((i) => `- ${i.name} x ${i.variant} x ${i.quantity} - ${i.price} MAD`)
     .join("\n");
 
-  const message = `🛍 Client: ${args.name}\nTél: ${args.phone}\nTotal: ${args.total} MAD\nVille: ${args.cityName}\nRéf: ${args.orderNum}\n\nArticles:\n${itemsList}`;
+  const utm = [
+    args.utmSource ? `Source: ${args.utmSource}` : "",
+    args.utmContent ? `Créa: ${args.utmContent}` : "",
+  ]
+    .filter(Boolean)
+    .join(" | ");
+
+  const message = `🛍 Client: ${args.name}\nTél: ${args.phone}\nTotal: ${args.total} MAD\nVille: ${args.cityName}\nRéf: ${args.orderNum}${utm ? `\n📣 ${utm}` : ""}\n\nArticles:\n${itemsList}`;
 
   const results = await Promise.allSettled(
     NTFY_TOPICS.map(async (topic) => {

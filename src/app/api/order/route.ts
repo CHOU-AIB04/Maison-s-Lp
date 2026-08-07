@@ -33,6 +33,8 @@ type OrderPayload = {
   qty?: number;
   lang?: string;
   source?: string;
+  utmSource?: string;
+  utmContent?: string;
 };
 
 const EMAIL_TO = (process.env.ORDER_EMAIL_TO || "chouaibalx@gmail.com,m.eladraouy@gmail.com")
@@ -108,6 +110,8 @@ async function sendOrderEmail(args: {
   shipping: number;
   total: number;
   source: string;
+  utmSource: string;
+  utmContent: string;
 }) {
   if (!process.env.RESEND_API_KEY) {
     console.warn("RESEND_API_KEY manquant — email non envoyé");
@@ -126,6 +130,8 @@ async function sendOrderEmail(args: {
     shipping: args.shipping,
     total: args.total,
     source: args.source,
+    utmSource: args.utmSource,
+    utmContent: args.utmContent,
   });
 
   const res = await fetch("https://api.resend.com/emails", {
@@ -212,6 +218,8 @@ export async function POST(req: NextRequest) {
   const shipping = body.shipping ?? 0;
   const total = body.total ?? subtotal - discount + shipping;
   const source = body.source || body.model || "LP";
+  const utmSource = (body.utmSource || "").slice(0, 60);
+  const utmContent = (body.utmContent || "").slice(0, 60);
 
   const row = {
     date: new Date().toISOString(),
@@ -234,6 +242,8 @@ export async function POST(req: NextRequest) {
     total,
     lang: body.lang || "fr",
     source,
+    utmSource,
+    utmContent,
   };
 
   // ── Forcelog : bloquant (si ça échoue, on n'annonce pas la commande comme prise)
@@ -258,6 +268,8 @@ export async function POST(req: NextRequest) {
       items,
       image: items[0]?.image || "",
       source,
+      utmSource,
+      utmContent,
     }),
     sendOrderEmail({
       orderNum,
@@ -271,6 +283,8 @@ export async function POST(req: NextRequest) {
       shipping,
       total,
       source,
+      utmSource,
+      utmContent,
     }),
     logToBlob({ ...row, forcelog: forcelog.ok }),
   ]);
