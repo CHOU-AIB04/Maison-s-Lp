@@ -179,7 +179,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
               name: product.name.fr,
               variant: variant.label.fr,
               quantity: qty,
-              price: bundle.unit,
+              price: product.price,
               image: img(variant.img, 400),
             },
           ],

@@ -16,7 +16,7 @@ export type Lang = "fr" | "ar";
 export type L = { fr: string; ar: string };
 
 export type Variant = { key: string; label: L; img: string; gallery?: string[]; desc?: L };
-export type Bundle = { qty: number; unit: number; badge?: L };
+export type Bundle = { qty: number; total: number; badge?: L };
 export type Benefit = { icon: string; title: L; desc: L };
 export type Faq = { q: L; a: L };
 export type Review = { name: L; city: L; stars: number; text: L; ago: L };
@@ -151,11 +151,14 @@ const INCLUDED_PARURE: L[] = [
   { fr: "1 chiffon de polissage offert", ar: "قطعة تلميع مجانية" },
 ];
 
-/** Packs standards : -20 DH/pièce dès 2, -30 DH/pièce dès 3 */
-const bundlesFor = (price: number, d2: number, d3: number): Bundle[] => [
-  { qty: 1, unit: price },
-  { qty: 2, unit: price - d2, badge: { fr: "Le plus populaire", ar: "الأكثر طلبًا" } },
-  { qty: 3, unit: price - d3, badge: { fr: "Meilleure valeur", ar: "أحسن قيمة" } },
+/**
+ * Packs. save2 / save3 = remise TOTALE du pack en DH (pas par pièce).
+ * bundlesFor(139, 30, 50) → 1×139 · 2×139−30 = 248 · 3×139−50 = 367
+ */
+const bundlesFor = (price: number, save2: number, save3: number): Bundle[] => [
+  { qty: 1, total: price },
+  { qty: 2, total: price * 2 - save2, badge: { fr: "Le plus populaire", ar: "الأكثر طلبًا" } },
+  { qty: 3, total: price * 3 - save3, badge: { fr: "Meilleure valeur", ar: "أحسن قيمة" } },
 ];
 
 const rev = (
@@ -198,8 +201,8 @@ export const PRODUCTS: LPProduct[] = [
       fr: "Parures florales serties de cristaux sur acier inoxydable plaqué or 18K ou argent rhodié. Choisissez votre modèle, on vous le livre en coffret — vous payez à la réception.",
       ar: "أطقم زهرية مرصّعة بالكريستال على فولاذ مطلي بذهب 18 قيراط ولا فضة. ختاري الموديل ديالك، وكيوصلك فعلبة — وكتخلصي عند الاستلام.",
     },
-    price: 149,
-    compareAt: 219,
+    price: 139,
+    compareAt: 209,
     rating: 4.9,
     reviewCount: 536,
     stock: 7,
@@ -224,7 +227,6 @@ export const PRODUCTS: LPProduct[] = [
           "v1782485773/prod5_white_C_c0yb8p.jpg",
           "v1782485767/prod4_black_C_r8wqhk.jpg",
           "v1782146354/product_12_lskeyt.png",
-          "v1783970112/768b1aec724deadb6a4cc64a180ccfc7_1_1783969735_4237_xn6aze.png",
         ],
       },
       {
@@ -280,7 +282,7 @@ export const PRODUCTS: LPProduct[] = [
         ],
       },
     ],
-    bundles: bundlesFor(149, 20, 30),
+    bundles: bundlesFor(139, 30, 50),
     usps: [
       { fr: "5 modèles au même prix", ar: "5 موديلات بنفس الثمن" },
       { fr: "Collier + bracelet en coffret", ar: "عقد + سوار فعلبة" },
@@ -301,14 +303,14 @@ export const PRODUCTS: LPProduct[] = [
       {
         q: { fr: "Les 5 modèles sont-ils au même prix ?", ar: "واش الخمسة موديلات بنفس الثمن؟" },
         a: {
-          fr: "Oui, 149 dh quel que soit le modèle choisi, livraison comprise. Le pack de 2 ou 3 peut mélanger les modèles : indiquez-le simplement lors de l'appel de confirmation.",
-          ar: "إيه، 149 درهم لأي موديل، والتوصيل داخل. الباك ديال 2 ولا 3 تقدري تخلطي فيه الموديلات: غير قوليها للمكلف منين نعيطو ليك باش نأكدو.",
+          fr: "Oui, 139 dh quel que soit le modèle choisi, livraison comprise. Le pack de 2 ou 3 peut mélanger les modèles : indiquez-le simplement lors de l'appel de confirmation.",
+          ar: "إيه، 139 درهم لأي موديل، والتوصيل داخل. الباك ديال 2 ولا 3 تقدري تخلطي فيه الموديلات: غير قوليها للمكلف منين نعيطو ليك باش نأكدو.",
         },
       },
       ...FAQ_BASE,
     ],
     reviews: [
-      rev("Sara B.", "سارة ب.", "Casablanca", "الدار البيضاء", "J'ai pris la Bicolore, reçue en 24h et ouverte devant le livreur. Pour 149 dh je m'attendais à moins bien 🥰", "خديت ثنائي اللون، وصلاتني ف24 ساعة وحليتها قدام الموصّل. ب149 درهم كنت كنتسنى أقل 🥰", 3),
+      rev("Sara B.", "سارة ب.", "Casablanca", "الدار البيضاء", "J'ai pris la Bicolore, reçue en 24h et ouverte devant le livreur. Pour 139 dh je m'attendais à moins bien 🥰", "خديت ثنائي اللون، وصلاتني ف24 ساعة وحليتها قدام الموصّل. ب139 درهم كنت كنتسنى أقل 🥰", 3),
       rev("Imane K.", "إيمان ك.", "Marrakech", "مراكش", "2 mois de port quotidien avec la Dorée, douche comprise, aucune trace de noir. J'ai repris la Rouge après.", "شهرين وأنا لابسة الذهبي كل نهار، حتى فالدوش، بلا سواد. من بعد خديت الأحمر.", 8),
       rev("Meryem L.", "مريم ل.", "Rabat", "الرباط", "La Prestige au mariage de ma cousine : 4 personnes m'ont demandé où je l'avais achetée 😅", "البرستيج فعرس بنت عمي: 4 نسا سولوني منين شريتها 😅", 5),
       rev("Btissam O.", "ابتسام و.", "Fès", "فاس", "Enfin une parure argentée qui ne noircit pas au bout d'un mois. Ça faisait longtemps que je cherchais.", "أخيرًا طقم فضي ما كيسودش من بعد شهر. هادي مدة وأنا كنقلب.", 11),
@@ -317,7 +319,7 @@ export const PRODUCTS: LPProduct[] = [
     ],
     upsell: "parure-swan",
     seo: {
-      title: "Ensemble Tulip 🌷 Collier + Bracelet — 5 modèles, 149 dh | Maison d'Or",
+      title: "Ensemble Tulip 🌷 Collier + Bracelet — 5 modèles, 139 dh | Maison d'Or",
       description:
         "Parure Tulip : collier + bracelet sertis de cristaux, 5 modèles au choix (Bicolore, Prestige, Dorée, Argentée, Rouge). Ne ternit pas, hypoallergénique. Livraison gratuite au Maroc, paiement à la livraison.",
     },
@@ -341,7 +343,7 @@ export const PRODUCTS: LPProduct[] = [
       fr: "Collier à pendentif cygne sculpté et bracelet assorti. 6 coloris au choix, tous au même prix. Livré en coffret, payé à la réception.",
       ar: "عقد بدلاية بجعة منحوتة وسوار متناسق. 6 ألوان على اختيارك، كلهم بنفس الثمن. كيوصل فعلبة، والخلاص عند الاستلام.",
     },
-    price: 139,
+    price: 129,
     compareAt: 199,
     rating: 4.9,
     reviewCount: 251,
@@ -374,7 +376,7 @@ export const PRODUCTS: LPProduct[] = [
           fr: "Cristaux transparents : la version qu'on offre, elle va à toutes les tenues et à tous les âges.",
           ar: "كريستال شفاف: النسخة اللي كتنهدى، كتمشي مع كل الملابس وكل الأعمار.",
         },
-        gallery: ["v1782146354/product_9_d9gry9.png", "v1782146355/product_10_gebr70.png"],
+        gallery: ["v1782146354/product_9_d9gry9.png"],
       },
       {
         key: "noir-dore",
@@ -426,7 +428,7 @@ export const PRODUCTS: LPProduct[] = [
         gallery: ["v1782485766/prod2_white_C_gvnwin.jpg"],
       },
     ],
-    bundles: bundlesFor(139, 20, 30),
+    bundles: bundlesFor(129, 30, 50),
     usps: [
       { fr: "6 coloris au même prix", ar: "6 ألوان بنفس الثمن" },
       { fr: "Collier + bracelet en coffret", ar: "عقد + سوار فعلبة" },
@@ -473,7 +475,7 @@ export const PRODUCTS: LPProduct[] = [
     ],
     upsell: "parure-tulip",
     seo: {
-      title: "Ensemble Swan 🦢 Collier Pendentif Cygne — 6 coloris, 139 dh | Maison d'Or",
+      title: "Ensemble Swan 🦢 Collier Pendentif Cygne — 6 coloris, 129 dh | Maison d'Or",
       description:
         "Parure Swan : collier à pendentif cygne + bracelet assorti, 6 coloris au choix. Ne ternit pas, hypoallergénique. Livraison gratuite au Maroc, paiement à la livraison.",
     },
@@ -520,11 +522,7 @@ export const PRODUCTS: LPProduct[] = [
       { key: "black-silver", label: { fr: "Noir · Argent", ar: "أسود · فضي" }, img: "v1783970701/4f65dcf49a67ed61428e243c172e7b67_1_1783970597_2135_h0dl2l.png" },
       { key: "white-gold", label: { fr: "Blanc · Doré", ar: "أبيض · ذهبي" }, img: "v1783970789/7c8c9bed4a89e631817eb9b30b295f4c_1783970728862_ge8tku.png" },
     ],
-    bundles: [
-      { qty: 1, unit: 99 },
-      { qty: 2, unit: 89, badge: { fr: "Le plus populaire", ar: "الأكثر طلبًا" } },
-      { qty: 3, unit: 83, badge: { fr: "Meilleure valeur", ar: "أحسن قيمة" } },
-    ],
+    bundles: bundlesFor(99, 20, 40),
     usps: [
       { fr: "7 coloris disponibles", ar: "7 ألوان متوفرة" },
       { fr: "Se porte en accumulation", ar: "كيتلبس مركّب" },
@@ -612,5 +610,5 @@ export const LEGACY_REDIRECTS: Record<string, string> = {
   "parure-tulip-rouge": "parure-tulip",
 };
 
-export const bundleTotal = (b: Bundle) => b.unit * b.qty;
+export const bundleTotal = (b: Bundle) => b.total;
 export const bundleSaving = (b: Bundle, price: number) => price * b.qty - bundleTotal(b);
