@@ -46,7 +46,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
 
   /* ── Sélection ───────────────────────────────────────── */
   const [variantKey, setVariantKey] = useState(product.variants[0].key);
-  const [bundleIdx, setBundleIdx] = useState(product.bundles.length > 1 ? 1 : 0);
+  const [bundleIdx, setBundleIdx] = useState(0);
   const [galleryIdx, setGalleryIdx] = useState(0);
 
   const variant = product.variants.find((v) => v.key === variantKey) || product.variants[0];
