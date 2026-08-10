@@ -65,7 +65,6 @@ export default function ProductLP({ product }: { product: LPProduct }) {
   /* ── Formulaire ──────────────────────────────────────── */
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
   const [cityCode, setCityCode] = useState("");
   const [cityQuery, setCityQuery] = useState("");
   const [cityOpen, setCityOpen] = useState(false);
@@ -195,7 +194,6 @@ export default function ProductLP({ product }: { product: LPProduct }) {
     const norm = phone.replace(/\s+/g, "").replace(/^\+?212/, "0");
     if (!/^0[567]\d{8}$/.test(norm)) return setErr(t.errPhone);
     if (!cityCode) return setErr(t.errCity);
-    if (address.trim().length < 5) return setErr(t.errAddress);
 
     setStatus("sending");
     try {
@@ -206,7 +204,6 @@ export default function ProductLP({ product }: { product: LPProduct }) {
           name: name.trim(),
           phone: norm,
           cityCode,
-          address: address.trim(),
           items: [
             {
               name: product.name.fr,
@@ -272,7 +269,6 @@ export default function ProductLP({ product }: { product: LPProduct }) {
           name: name.trim(),
           phone: phone.replace(/\s+/g, "").replace(/^\+?212/, "0"),
           cityCode,
-          address: address.trim(),
           items: [
             {
               name: `${upsellProduct.name.fr} (UPSELL -50%)`,
@@ -591,7 +587,6 @@ export default function ProductLP({ product }: { product: LPProduct }) {
                 )}
               </div>
 
-              <input className="field" placeholder={t.fAddress} value={address} onChange={(e) => setAddress(e.target.value)} autoComplete="street-address" />
 
               {err && <p className="rounded-xl bg-red-50 px-4 py-2.5 text-sm font-bold text-red-600">{err}</p>}
 
