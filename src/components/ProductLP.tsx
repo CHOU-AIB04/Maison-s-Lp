@@ -404,9 +404,10 @@ export default function ProductLP({ product }: { product: LPProduct }) {
                 -{discountPct}%
               </span>
               <img
-                src={img(gallery[galleryIdx], 900)}
+                key={gallery[galleryIdx] ?? galleryIdx}
+                src={img(gallery[galleryIdx] ?? gallery[0], 900)}
                 alt={`${product.name.fr} — ${tr(variant.label)}`}
-                className="aspect-square w-full object-cover"
+                className="img-swap aspect-square w-full object-cover"
                 fetchPriority="high"
               />
             </div>
@@ -475,7 +476,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
                   {product.variants.map((v) => (
                     <button
                       key={v.key}
-                      onClick={() => setVariantKey(v.key)}
+                      onClick={() => { setVariantKey(v.key); setGalleryIdx(0); }}
                       title={tr(v.label)}
                       className={`overflow-hidden rounded-2xl border-2 transition ${
                         variantKey === v.key ? "border-[var(--gold)] ring-2 ring-[var(--gold)]/30" : "border-[#e3d9c6]"
@@ -682,6 +683,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
                   key={v.key}
                   onClick={() => {
                     setVariantKey(v.key);
+                    setGalleryIdx(0);
                     document.getElementById("photo")?.scrollIntoView({ behavior: "smooth", block: "start" });
                   }}
                   className="w-20 shrink-0"

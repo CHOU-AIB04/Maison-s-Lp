@@ -87,6 +87,16 @@ details[open] > summary { color: var(--gold-dark); }
 /* Sélecteur de pack : fond doré léger */
 .bg-\[var\(--gold\)\]\/8 { background-color: rgba(201, 162, 75, 0.08); }
 
+/* Animation de switch entre les images (variante / vignette) */
+@keyframes imgSwap {
+  from { opacity: 0; transform: scale(1.04); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.img-swap { animation: imgSwap 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* Vignettes : petite mise en avant de la sélection */
+.thumb-active { transform: scale(0.94); }
+
 @media (prefers-reduced-motion: reduce) {
-  .ticker, .cta-pulse, .fade-up { animation: none; }
+  .ticker, .cta-pulse, .fade-up, .img-swap { animation: none; }
 }
