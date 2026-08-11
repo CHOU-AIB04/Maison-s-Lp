@@ -51,26 +51,39 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
   const token = process.env.BLOB_READ_WRITE_TOKEN;
-  const [{ blobs }, statusMap] = await Promise.all([
-    list({ prefix: "orders/", token, limit: 1000 }),
-    getStatusMap(token),
-  ]);
+  if (!token) {
+    return NextResponse.json(
+      { ok: false, error: "no_blob_token", hint: "BLOB_READ_WRITE_TOKEN manquant sur Netlify", orders: [], count: 0 },
+      { status: 200 }
+    );
+  }
+  try {
+    const [listRes, statusMap] = await Promise.all([
+      list({ prefix: "orders/", token, limit: 1000 }),
+      getStatusMap(token),
+    ]);
 
-  const raw = await Promise.all(
-    blobs.map(async (b) => {
-      try {
-        const r = await fetch(b.url, { cache: "no-store" });
-        const o = await r.json();
-        const id = o.orderNum || b.pathname;
-        return { ...o, id, status: statusMap[id] || "new" };
-      } catch {
-        return null;
-      }
-    })
-  );
+    const raw = await Promise.all(
+      listRes.blobs.map(async (b) => {
+        try {
+          const r = await fetch(b.url, { cache: "no-store" });
+          const o = await r.json();
+          const id = o.orderNum || b.pathname;
+          return { ...o, id, status: statusMap[id] || "new" };
+        } catch {
+          return null;
+        }
+      })
+    );
 
-  const orders = raw.filter(Boolean).sort((a, b) => (a.date < b.date ? 1 : -1));
-  return NextResponse.json({ ok: true, count: orders.length, orders });
+    const orders = raw.filter(Boolean).sort((a, b) => (a.date < b.date ? 1 : -1));
+    return NextResponse.json({ ok: true, count: orders.length, orders });
+  } catch (e) {
+    return NextResponse.json(
+      { ok: false, error: "blob_error", message: e instanceof Error ? e.message : String(e), orders: [], count: 0 },
+      { status: 200 }
+    );
+  }
 }
 
 export async function PATCH(req: NextRequest) {
