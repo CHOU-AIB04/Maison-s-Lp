@@ -232,28 +232,28 @@ export const PRODUCTS: LPProduct[] = [
       {
         key: "prestige",
         label: { fr: "Prestige · Améthyste & Rosé", ar: "برستيج · أميتيست وزهري" },
-        img: "v1782146330/product_1_eufnps.png",
+        img: "v1782485786/prod10_white_c_ffubmd.jpg",
         desc: {
           fr: "Le modèle le plus travaillé : deux teintes de cristaux et motifs végétaux sculptés dans la monture.",
           ar: "الموديل الأكثر تفصيلًا: لونين من الكريستال ونقوش نباتية منحوتة فالقاعدة.",
         },
         gallery: [
-          "v1782146330/product_1_eufnps.png",
           "v1782485786/prod10_white_c_ffubmd.jpg",
+          "v1782146330/product_1_eufnps.png",
           "v1782485784/prod10_black_c_fwk74g.jpg",
         ],
       },
       {
         key: "doree",
         label: { fr: "Dorée · Cristal", ar: "ذهبي · كريستال" },
-        img: "v1782485762/prod7_black_C_tlt0av.jpg",
+        img: "v1782485761/prod7_white_c_qfwvfm.jpg",
         desc: {
           fr: "Vigne dorée et cristaux transparents : aucune couleur à assortir, il va avec toutes les tenues.",
           ar: "أغصان ذهبية وكريستال شفاف: بلا لون خاصك تناسبيه، كيمشي مع كل الملابس.",
         },
         gallery: [
-          "v1782485762/prod7_black_C_tlt0av.jpg",
           "v1782485761/prod7_white_c_qfwvfm.jpg",
+          "v1782485762/prod7_black_C_tlt0av.jpg",
           "v1782146339/product_7_jyzzbg.png",
           "v1782146338/product_4_c1mlob.png",
         ],
@@ -271,14 +271,14 @@ export const PRODUCTS: LPProduct[] = [
       {
         key: "rouge",
         label: { fr: "Rouge · Rubis", ar: "أحمر · ياقوتي" },
-        img: "v1782485761/prod1_black_caree_dddkql.jpg",
+        img: "v1782513698/image_1782513620489_7rhkph_vjjjbk.jpg",
         desc: {
           fr: "Cristaux rouge rubis sur monture argentée — le modèle des caftans et des soirées.",
           ar: "كريستال أحمر ياقوتي على قاعدة فضية — موديل القفاطن والسهرات.",
         },
         gallery: [
-          "v1782485761/prod1_black_caree_dddkql.jpg",
           "v1782513698/image_1782513620489_7rhkph_vjjjbk.jpg",
+          "v1782485761/prod1_black_caree_dddkql.jpg",
         ],
       },
     ],
@@ -348,10 +348,10 @@ export const PRODUCTS: LPProduct[] = [
     rating: 4.9,
     reviewCount: 251,
     stock: 6,
-    hero: "v1782146353/product_11_hr9u2c.png",
+    hero: "v1782485765/prod3_white_C_agk2ln.jpg",
     gallery: [
-      "v1782146353/product_11_hr9u2c.png",
-      "v1782146354/product_9_d9gry9.png",
+      "v1782485765/prod3_white_C_agk2ln.jpg",
+      "v1782497783/prod13_white_c_oruw4c.jpg",
       "v1782485788/prod12_black_c_nqjzw6.jpg",
       "v1782498863/image_1782498828281_jnc8yf_kmfzqo.jpg",
       "v1782485781/prod6_whie_c_ne2gnl.jpg",
@@ -361,47 +361,54 @@ export const PRODUCTS: LPProduct[] = [
       {
         key: "amethyste",
         label: { fr: "Améthyste", ar: "أميتيست" },
-        img: "v1782146353/product_11_hr9u2c.png",
+        img: "v1782485765/prod3_white_C_agk2ln.jpg",
         desc: {
           fr: "Cristaux violets sur argent rhodié — le violet met particulièrement en valeur les peaux mates.",
           ar: "كريستال بنفسجي على الفضة — البنفسجي كيبرز البشرة القمحية بزاف.",
         },
-        gallery: ["v1782146353/product_11_hr9u2c.png", "v1782146355/product_10_gebr70.png"],
+        gallery: [
+          "v1782485765/prod3_white_C_agk2ln.jpg",
+          "v1782146353/product_11_hr9u2c.png",
+          "v1782146355/product_10_gebr70.png",
+        ],
       },
       {
         key: "blanc",
         label: { fr: "Blanc", ar: "أبيض" },
-        img: "v1782146354/product_9_d9gry9.png",
+        img: "v1782497783/prod13_white_c_oruw4c.jpg",
         desc: {
           fr: "Cristaux transparents : la version qu'on offre, elle va à toutes les tenues et à tous les âges.",
           ar: "كريستال شفاف: النسخة اللي كتنهدى، كتمشي مع كل الملابس وكل الأعمار.",
         },
-        gallery: ["v1782146354/product_9_d9gry9.png"],
+        gallery: [
+          "v1782497783/prod13_white_c_oruw4c.jpg",
+          "v1782146354/product_9_d9gry9.png",
+        ],
       },
       {
         key: "noir-dore",
         label: { fr: "Noir & Doré", ar: "أسود · ذهبي" },
-        img: "v1782485788/prod12_black_c_nqjzw6.jpg",
+        img: "v1782485789/prod12_white_c_cg7zrs.jpg",
         desc: {
           fr: "Cristaux noirs sur monture dorée — le contraste le plus fort de la collection Swan.",
           ar: "كريستال أسود على قاعدة ذهبية — أقوى تباين فمجموعة Swan.",
         },
         gallery: [
-          "v1782485788/prod12_black_c_nqjzw6.jpg",
           "v1782485789/prod12_white_c_cg7zrs.jpg",
+          "v1782485788/prod12_black_c_nqjzw6.jpg",
         ],
       },
       {
         key: "rose-argent",
         label: { fr: "Rose & Argent", ar: "زهري · فضي" },
-        img: "v1782498863/image_1782498828281_jnc8yf_kmfzqo.jpg",
+        img: "v1782498863/image_1782498175677_w6b338_kjhxey.jpg",
         desc: {
           fr: "Rose poudré sur argent rhodié : la version la plus douce, très demandée en cadeau.",
           ar: "زهري ناعم على الفضة: النسخة الأكثر هدوءًا، ومطلوبة بزاف كهدية.",
         },
         gallery: [
-          "v1782498863/image_1782498828281_jnc8yf_kmfzqo.jpg",
           "v1782498863/image_1782498175677_w6b338_kjhxey.jpg",
+          "v1782498863/image_1782498828281_jnc8yf_kmfzqo.jpg",
         ],
       },
       {

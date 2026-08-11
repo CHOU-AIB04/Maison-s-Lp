@@ -73,6 +73,8 @@ export default function ProductLP({ product }: { product: LPProduct }) {
   const [orderNum, setOrderNum] = useState("");
   const [upsellState, setUpsellState] = useState<"offer" | "adding" | "added" | "declined">("offer");
   const [utm, setUtm] = useState({ source: "", content: "" });
+  const [revIdx, setRevIdx] = useState(0);
+  const touchX = useRef<number | null>(null);
   const checkoutStarted = useRef(false);
 
   const selectedCity = FORCELOG_CITIES.find((c) => c.code === cityCode);
@@ -124,6 +126,11 @@ export default function ProductLP({ product }: { product: LPProduct }) {
   }, []);
 
   useEffect(() => {
+    const id = setInterval(() => setRevIdx((i) => (i + 1) % Math.min(4, product.reviews.length)), 5000);
+    return () => clearInterval(id);
+  }, [product.reviews.length]);
+
+  useEffect(() => {
     track("ViewContent", {
       content_name: product.name.fr,
       content_ids: [product.id],
@@ -173,10 +180,8 @@ export default function ProductLP({ product }: { product: LPProduct }) {
     setTimeout(() => document.getElementById("f-name")?.focus(), 500);
   };
 
-  const pickPhoto = (i: number) => {
-    setGalleryIdx(i);
-    document.getElementById("photo")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
+  const prevPhoto = () => setGalleryIdx((i) => (i - 1 + gallery.length) % gallery.length);
+  const nextPhoto = () => setGalleryIdx((i) => (i + 1) % gallery.length);
 
   const waLink = () => {
     const msg =
@@ -386,117 +391,160 @@ export default function ProductLP({ product }: { product: LPProduct }) {
     <div dir={dir} className="min-h-screen pb-24">
       <TopBar lang={lang} setLang={setLang} t={t} />
 
-      <nav className="mx-auto max-w-6xl px-4 pt-3 text-xs text-[#8a8172]">
-        <span>{t.home}</span>
-        <span className="mx-1.5">›</span>
-        <span>{tr(product.category)}</span>
-        <span className="mx-1.5">›</span>
-        <span className="font-semibold text-[#5b5346]">{tr(product.name)}</span>
-      </nav>
-
-      {/* ═══ BLOC ACHAT — photo + commande, sans scroll ═══ */}
-      <section className="mx-auto max-w-6xl px-4 pb-8 pt-3">
-        <div className="grid gap-6 md:grid-cols-2 md:gap-10">
-          {/* Photos */}
-          <div id="photo" className="fade-up scroll-mt-20 md:sticky md:top-20 md:self-start">
-            <div className="relative overflow-hidden rounded-3xl bg-white shadow-lg">
-              <span className="absolute start-3 top-3 z-10 rounded-full bg-red-600 px-3 py-1 text-xs font-black text-white shadow">
-                -{discountPct}%
+      {/* ═══ BLOC ACHAT ═══ */}
+      <section className="mx-auto max-w-[1240px] px-4 pb-10 pt-6 lg:px-8">
+        <div className="grid gap-8 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
+          {/* ── Diaporama ─────────────────────────────── */}
+          <div id="photo" className="fade-up scroll-mt-20 lg:sticky lg:top-24 lg:self-start">
+            <div
+              className="group relative overflow-hidden rounded-[2px] bg-white shadow-[0_2px_24px_rgba(26,22,19,0.07)]"
+              onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
+              onTouchEnd={(e) => {
+                if (touchX.current === null) return;
+                const d = e.changedTouches[0].clientX - touchX.current;
+                if (Math.abs(d) > 40) (d > 0 ? prevPhoto : nextPhoto)();
+                touchX.current = null;
+              }}
+            >
+              <span className="absolute start-4 top-4 z-10 rounded-full bg-[#1a1613] px-3 py-1.5 text-[11px] font-bold tracking-wide text-white">
+                −{discountPct}%
               </span>
+
               <img
-                key={gallery[galleryIdx] ?? galleryIdx}
-                src={img(gallery[galleryIdx] ?? gallery[0], 900)}
+                key={gallery[galleryIdx]}
+                src={img(gallery[galleryIdx], 1000)}
                 alt={`${product.name.fr} — ${tr(variant.label)}`}
                 className="img-swap aspect-square w-full object-cover"
                 fetchPriority="high"
               />
+
+              {gallery.length > 1 && (
+                <>
+                  <button
+                    onClick={prevPhoto}
+                    aria-label="Précédent"
+                    className="absolute start-3 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-lg text-[#1a1613] shadow-md backdrop-blur transition hover:bg-white group-hover:flex"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    onClick={nextPhoto}
+                    aria-label="Suivant"
+                    className="absolute end-3 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-lg text-[#1a1613] shadow-md backdrop-blur transition hover:bg-white group-hover:flex"
+                  >
+                    ›
+                  </button>
+                </>
+              )}
             </div>
+
+            {/* Compteur + navigation (mobile & desktop) */}
             {gallery.length > 1 && (
-              <div
-                className="mt-3 grid gap-2"
-                style={{ gridTemplateColumns: `repeat(${Math.min(gallery.length, 5)}, minmax(0, 1fr))` }}
-              >
-                {gallery.slice(0, 5).map((g, i) => (
+              <div className="mt-3 flex items-center justify-center gap-5 text-sm text-[#8a8172]">
+                <button onClick={prevPhoto} aria-label="Précédent" className="px-2 text-lg leading-none transition hover:text-[#1a1613]">
+                  ‹
+                </button>
+                <span className="tabular-nums tracking-wide">
+                  {galleryIdx + 1} <span className="text-[#c6bca8]">/</span> {gallery.length}
+                </span>
+                <button onClick={nextPhoto} aria-label="Suivant" className="px-2 text-lg leading-none transition hover:text-[#1a1613]">
+                  ›
+                </button>
+              </div>
+            )}
+
+            {/* Miniatures */}
+            {gallery.length > 1 && (
+              <div className="mt-3 flex gap-2.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {gallery.map((g, i) => (
                   <button
                     key={g}
                     onClick={() => setGalleryIdx(i)}
-                    className={`overflow-hidden rounded-xl border-2 transition ${
-                      galleryIdx === i ? "border-[var(--gold)]" : "border-[#e7ddca]"
-                    }`}
                     aria-label={`Photo ${i + 1}`}
+                    className={`h-[74px] w-[74px] shrink-0 overflow-hidden rounded-[2px] border transition ${
+                      galleryIdx === i ? "border-[#1a1613]" : "border-[#e7ddca] opacity-70 hover:opacity-100"
+                    }`}
                   >
-                    <img src={img(g, 220)} alt="" className="aspect-square w-full object-cover" />
+                    <img src={img(g, 220)} alt="" className="h-full w-full object-cover" />
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Commande */}
+          {/* ── Colonne commande ───────────────────────── */}
           <div className="fade-up">
-            <a href="#avis" className="mb-2 inline-flex items-center gap-2">
+            {countdown && (
+              <div className="mb-4 inline-flex items-center gap-2 rounded-[2px] border border-[var(--gold)] px-3.5 py-1.5 text-[12px] font-bold tracking-wide text-[var(--gold-dark)]">
+                <span>⏳</span>
+                {t.saleEnds} · <span className="font-mono tabular-nums">{countdown}</span>
+              </div>
+            )}
+
+            <h1 className="font-display mb-3 text-[34px] font-bold leading-[1.1] tracking-tight md:text-[44px]">
+              {tr(product.name)}
+            </h1>
+
+            <a href="#avis" className="mb-4 inline-flex items-center gap-2">
               <Stars n={5} />
-              <span className="text-sm font-bold text-[#5b5346]">{product.rating.toFixed(1).replace(".", ",")}</span>
-              <span className="text-sm text-[#8a8172] underline">
+              <span className="text-sm font-semibold text-[#5b5346]">{product.rating.toFixed(1).replace(".", ",")}</span>
+              <span className="text-sm text-[#8a8172] underline underline-offset-2">
                 {product.reviewCount} {t.reviews}
               </span>
             </a>
 
-            <h1 className="font-display mb-2 text-3xl font-black leading-tight md:text-4xl">
-              {product.emoji} {tr(product.name)}
-            </h1>
-
-            <div className="mb-2 flex items-baseline gap-3">
-              <span className="font-display text-4xl font-black gold-text">
-                {product.price} {t.dh}
+            <div className="mb-5 flex flex-wrap items-baseline gap-3">
+              <span className="font-display text-[40px] md:text-[55px] font-extrabold text-black">
+                {product.price},00 {t.dh}
               </span>
               <span className="text-lg text-[#a09889] line-through">
-                {product.compareAt} {t.dh}
+                {product.compareAt},00 {t.dh}
               </span>
-              <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-black text-red-600">-{discountPct}%</span>
+              <span className="inline-flex items-center gap-1 rounded-[2px] bg-[#1a1613] px-2.5 py-1 text-[11px] font-bold text-white">
+                🏷 −{discountPct}%
+              </span>
             </div>
 
-            {/* USP en puces courtes */}
-            <div className="mb-5 flex flex-wrap gap-1.5">
+            <ul className="mb-6 space-y-2">
               {product.usps.map((u, i) => (
-                <span key={i} className="rounded-full border border-[#e7ddca] bg-white px-2.5 py-1 text-xs font-semibold text-[#4a4436]">
-                  ✓ {tr(u)}
-                </span>
+                <li key={i} className="flex items-start gap-2.5 text-[15px] leading-snug text-[#4a4436]">
+                  <span>{["✨", "💧", "🌿", "🎁"][i % 4]}</span>
+                  <span>{tr(u)}</span>
+                </li>
               ))}
-            </div>
+            </ul>
 
-            {/* Variantes */}
+            {/* Modèle */}
             {product.variants.length > 1 && (
-              <div className="mb-5">
-                <div className="mb-2 text-sm">
-                  <span className="font-bold">{t.model} :</span>{" "}
-                  <span className="text-[#8a8172]">{tr(variant.label)}</span>
+              <div className="mb-6">
+                <div className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8a8172]">
+                  {t.model} — <span className="text-[#1a1613]">{tr(variant.label)}</span>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2.5">
                   {product.variants.map((v) => (
                     <button
                       key={v.key}
-                      onClick={() => { setVariantKey(v.key); setGalleryIdx(0); }}
+                      onClick={() => setVariantKey(v.key)}
                       title={tr(v.label)}
-                      className={`overflow-hidden rounded-2xl border-2 transition ${
-                        variantKey === v.key ? "border-[var(--gold)] ring-2 ring-[var(--gold)]/30" : "border-[#e3d9c6]"
+                      aria-label={tr(v.label)}
+                      className={`h-[58px] w-[58px] overflow-hidden rounded-[2px] border transition ${
+                        variantKey === v.key
+                          ? "border-[#1a1613] ring-1 ring-[#1a1613]"
+                          : "border-[#e7ddca] opacity-80 hover:opacity-100"
                       }`}
                     >
-                      <img src={img(v.img, 140)} alt={tr(v.label)} className="h-14 w-14 object-cover" />
+                      <img src={img(v.img, 160)} alt="" className="h-full w-full object-cover" />
                     </button>
                   ))}
                 </div>
-                {variant.desc && (
-                  <p className="mt-2 text-sm leading-relaxed text-[#6b6353]">{tr(variant.desc)}</p>
-                )}
+                {variant.desc && <p className="mt-3 text-sm leading-relaxed text-[#6b6353]">{tr(variant.desc)}</p>}
               </div>
             )}
 
             {/* Packs */}
-            <div className="mb-4">
-              <div className="mb-2 flex items-center gap-2 text-sm font-black tracking-wide">
-                <span>📦</span>
-                <span>{t.bundleTitle}</span>
+            <div className="mb-6">
+              <div className="mb-2.5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8a8172]">
+                <span>📦</span> {t.bundleTitle}
               </div>
               <div className="space-y-2">
                 {product.bundles.map((b, i) => {
@@ -507,26 +555,42 @@ export default function ProductLP({ product }: { product: LPProduct }) {
                     <button
                       key={b.qty}
                       onClick={() => setBundleIdx(i)}
-                      className={`flex w-full items-center justify-between rounded-2xl border-2 px-4 py-3 text-start transition ${
-                        active ? "border-[var(--gold)] bg-[var(--gold)]/8 shadow-md" : "border-[#e3d9c6] bg-white"
+                      className={`flex w-full items-center justify-between rounded-[3px] border px-4 py-3.5 text-start transition ${
+                        active
+                          ? "border-[var(--gold)] bg-[var(--gold)]/8 shadow-[0_1px_10px_rgba(201,162,75,0.18)]"
+                          : "border-[#e7ddca] bg-white hover:border-[#cbbb9a]"
                       }`}
                     >
-                      <span className="flex items-center gap-2.5">
-                        <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${active ? "border-[var(--gold-dark)]" : "border-[#cbbb9a]"}`}>
-                          {active && <span className="h-2.5 w-2.5 rounded-full bg-[var(--gold-dark)]" />}
+                      <span className="flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3">
+                        <span
+                          className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border transition ${
+                            active ? "border-[var(--gold-dark)] border-[5px]" : "border-[#cbbb9a]"
+                          }`}
+                        />
+                        <span className="min-w-0">
+                          <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                            <span className="whitespace-nowrap font-semibold">{t.piece(b.qty)}</span>
+                            {b.badge && (
+                              <span className="whitespace-nowrap rounded-full bg-[#1a1613] px-2 py-0.5 text-[10px] font-bold tracking-wide text-white">
+                                {tr(b.badge)}
+                              </span>
+                            )}
+                          </span>
+                          {saving > 0 && (
+                            <span className="mt-0.5 block whitespace-nowrap text-[13px] font-bold text-green-700">
+                              − {saving} {t.dh} {t.saved}
+                            </span>
+                          )}
                         </span>
-                        <span className="font-bold">{t.piece(b.qty)}</span>
-                        {b.badge && (
-                          <span className="rounded-full bg-[#1a1613] px-2 py-0.5 text-[10px] font-bold text-white">{tr(b.badge)}</span>
-                        )}
-                        {saving > 0 && (
-                          <span className="text-xs font-bold text-green-700">− {saving} {t.dh}</span>
-                        )}
                       </span>
-                      <span className="text-end">
-                        <span className="block font-display text-lg font-black">{bTotal} {t.dh}</span>
+                      <span className="shrink-0 text-end leading-tight">
+                        <span className="font-display block whitespace-nowrap text-[19px] font-bold">
+                          {bTotal} {t.dh}
+                        </span>
                         {saving > 0 && (
-                          <span className="block text-xs text-[#a09889] line-through">{product.price * b.qty} {t.dh}</span>
+                          <span className="block whitespace-nowrap text-xs text-[#a09889] line-through">
+                            {product.price * b.qty} {t.dh}
+                          </span>
                         )}
                       </span>
                     </button>
@@ -535,15 +599,15 @@ export default function ProductLP({ product }: { product: LPProduct }) {
               </div>
             </div>
 
-            {/* ── FORMULAIRE DIRECTEMENT ICI ── */}
+            {/* ── Formulaire de commande ── */}
             <form
               id="commander"
               onSubmit={submit}
               onFocus={startCheckout}
-              className="scroll-mt-20 space-y-2.5 rounded-3xl border-2 border-[var(--gold)]/40 bg-white p-4 shadow-lg"
+              className="scroll-mt-24 space-y-2.5 rounded-[3px] border border-[#e7ddca] bg-white p-5 shadow-[0_2px_18px_rgba(26,22,19,0.06)]"
             >
-              <p className="text-center text-sm font-bold text-[#4a4436]">
-                💵 {t.formTitle} — {t.cod}
+              <p className="mb-1 text-center text-[11px] font-bold uppercase tracking-[0.18em] text-[#8a8172]">
+                {t.formTitle}
               </p>
 
               <input type="hidden" name="utm_source" value={utm.source} readOnly />
@@ -567,7 +631,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
                   autoComplete="off"
                 />
                 {cityOpen && (
-                  <div className="absolute z-30 mt-1 max-h-56 w-full overflow-auto rounded-2xl border border-[#e3d9c6] bg-white shadow-xl">
+                  <div className="absolute z-30 mt-1 max-h-56 w-full overflow-auto rounded-[3px] border border-[#e3d9c6] bg-white shadow-xl">
                     {filteredCities.length === 0 && <div className="px-4 py-3 text-sm text-[#8a8172]">{t.noCity}</div>}
                     {filteredCities.map((c) => (
                       <button
@@ -588,160 +652,179 @@ export default function ProductLP({ product }: { product: LPProduct }) {
                 )}
               </div>
 
+              {err && <p className="rounded-[3px] bg-red-50 px-4 py-2.5 text-sm font-bold text-red-600">{err}</p>}
 
-              {err && <p className="rounded-xl bg-red-50 px-4 py-2.5 text-sm font-bold text-red-600">{err}</p>}
-
-              <div className="flex items-center justify-between rounded-2xl bg-[var(--cream)] px-4 py-2.5 text-sm">
-                <span>
-                  <span className="font-bold">{t.total}</span>
+              <div className="flex items-center justify-between border-t border-[#f0e8d8] pt-3 text-sm">
+                <span className="font-semibold">
+                  {t.total}
                   {discount > 0 && (
-                    <span className="ms-2 text-xs font-bold text-green-700">− {discount} {t.dh}</span>
+                    <span className="ms-2 text-xs font-bold text-green-700">
+                      − {discount} {t.dh}
+                    </span>
                   )}
-                  <span className="ms-2 text-xs font-bold text-green-700">🚚 {t.free}</span>
                 </span>
-                <span className="font-display text-2xl font-black gold-text">{total} {t.dh}</span>
+                <span className="font-display text-[26px] font-bold text-[var(--gold-dark)]">
+                  {total} {t.dh}
+                </span>
               </div>
 
-              <button type="submit" disabled={status === "sending"} className="cta-pulse w-full rounded-full gold-bg py-4 text-lg font-black text-white shadow-xl disabled:opacity-60">
+              <button
+                type="submit"
+                disabled={status === "sending"}
+                className="w-full rounded-[3px] bg-[#1a1613] py-4 text-[15px] font-bold tracking-wide text-white transition hover:bg-[#2c2721] disabled:opacity-60"
+              >
                 {status === "sending" ? t.sending : `${t.submit} — ${total} ${t.dh}`}
               </button>
 
-              <a href={waLink()} target="_blank" rel="noopener" className="block text-center text-xs font-bold text-[#25a34e] underline">
-                {t.orWhats}
-              </a>
+              <p className="text-center text-xs text-[#8a8172]">🔒 {t.cod} · {t.freeShip}</p>
             </form>
 
-            {/* Réassurance compacte */}
-            <div className="mt-3 space-y-1.5 text-sm">
-              {delivery && (
-                <p className="flex items-center gap-2 text-[#4a4436]">
-                  <span>🚚</span>
-                  <span>{t.deliveryBetween(delivery.a, delivery.b)} — <strong className="text-green-700">{t.free}</strong></span>
-                </p>
-              )}
-              <p className="flex items-center gap-2 font-semibold text-[#b8791a]">
-                <span>⚡</span> {t.lowStock(product.stock)}
+            {/* Livraison estimée */}
+            {delivery && (
+              <p className="mt-4 flex items-center gap-2.5 text-[12px] md:text-[15px] text-[#4a4436]">
+                <span className="text-lg">🚚</span>
+                <span>
+                  {t.deliveryBetween(delivery.a, delivery.b)} — <strong>{t.free}</strong>
+                </span>
               </p>
-              {countdown && (
-                <p className="flex items-center gap-2 text-[#4a4436]">
-                  <span>⏳</span>
-                  <span>{t.offerEndsIn} <strong className="font-mono">{countdown}</strong></span>
-                </p>
-              )}
+            )}
+            <p className="mt-1.5 flex items-center gap-2.5 text-[12px] md:text-[15px] font-semibold text-[#b8791a]">
+              <span className="text-lg">⚡</span> {t.lowStock(product.stock)}
+            </p>
+
+            {/* Avis en vitrine */}
+            <div className="mt-5 border-t border-[#e7ddca] pt-4">
+              <div className="flex items-start gap-3">
+                <span className="font-display flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--gold)]/20 text-sm font-bold text-[var(--gold-dark)]">
+                  {tr(product.reviews[revIdx].name).charAt(0)}
+                </span>
+                <div className="min-h-[52px] flex-1">
+                  <p className="text-[15px] leading-snug text-[#4a4436]">{tr(product.reviews[revIdx].text)}</p>
+                  <p className="mt-1 flex items-center gap-2 text-xs text-[#8a8172]">
+                    <span className="italic">{tr(product.reviews[revIdx].name)}</span>
+                    <Stars n={product.reviews[revIdx].stars} className="scale-90" />
+                  </p>
+                </div>
+              </div>
+              <div className="mt-2 flex justify-center gap-1.5">
+                {product.reviews.slice(0, 4).map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setRevIdx(i)}
+                    aria-label={`Avis ${i + 1}`}
+                    className={`h-1.5 rounded-full transition-all ${i === revIdx ? "w-4 bg-[#1a1613]" : "w-1.5 bg-[#d8cdb6]"}`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Accordéons */}
+            <div className="mt-5 divide-y divide-[#e7ddca] border-y border-[#e7ddca]">
+              <details className="group py-4 [&_summary::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer items-center gap-3 font-semibold text-[#1a1613]">
+                  <span>♡</span>
+                  {t.qualityTitle}
+                  <span className="ms-auto text-[#8a8172] transition group-open:rotate-180">⌄</span>
+                </summary>
+                <div className="mt-3">
+                  {product.specs.map((sp, i) => (
+                    <div key={i} className="flex justify-between gap-4 py-1.5 text-sm">
+                      <span className="text-[#8a8172]">{tr(sp.label)}</span>
+                      <span className="text-end text-[#1a1613]">{tr(sp.value)}</span>
+                    </div>
+                  ))}
+                </div>
+              </details>
+              <details className="group py-4 [&_summary::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer items-center gap-3 font-semibold text-[#1a1613]">
+                  <span>📦</span>
+                  {t.payDeliveryTitle}
+                  <span className="ms-auto text-[#8a8172] transition group-open:rotate-180">⌄</span>
+                </summary>
+                <ul className="mt-3 space-y-1.5">
+                  {t.payDelivery.map((line, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-[#4a4436]">
+                      <span className="text-green-600">✓</span>
+                      {line}
+                    </li>
+                  ))}
+                </ul>
+              </details>
             </div>
           </div>
         </div>
       </section>
+
+      {/* ═══ BANDEAU DÉFILANT ═══ */}
+      <div className="overflow-hidden border-y border-[#e7ddca] bg-[var(--gold)]/15 py-3 text-[11px] font-bold uppercase tracking-[0.15em] text-[#6b5a33]">
+        <div className="ticker flex w-max gap-12 whitespace-nowrap px-6">
+          {[...t.marquee, ...t.marquee].map((txt, i) => (
+            <span key={i}>✦ {txt}</span>
+          ))}
+        </div>
+      </div>
 
       {/* ═══ CONFIANCE ═══ */}
-      <section className="border-y border-[#e7ddca] bg-white/70">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-4 px-4 py-5 text-center md:grid-cols-4">
-          {[
-            ["💵", t.cod, t.codDesc],
-            ["📦", t.openBox, t.openBoxDesc],
-            ["🚚", t.freeShip, "24h — 72h"],
-            ["💬", t.support, t.supportDesc],
-          ].map(([e, ti, de], i) => (
-            <div key={i} className="flex flex-col items-center gap-0.5">
-              <span className="text-2xl">{e}</span>
-              <span className="text-sm font-bold text-[#4a4436]">{ti}</span>
-              <span className="text-xs text-[#8a8172]">{de}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ═══ LE PRODUIT EN IMAGES ═══ */}
-      <section className="mx-auto max-w-6xl px-4 py-10">
-        <h2 className="font-display mb-5 text-center text-2xl font-black">{t.galleryTitle}</h2>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-          {gallery.map((g, i) => (
-            <button
-              key={g}
-              onClick={() => pickPhoto(i)}
-              className="group relative overflow-hidden rounded-2xl bg-white shadow-sm transition hover:shadow-xl"
-            >
-              <img
-                src={img(g, 700)}
-                alt={`${product.name.fr} ${i + 1}`}
-                className="aspect-square w-full object-cover transition duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
-            </button>
-          ))}
-        </div>
-
-        {/* Nuancier cliquable */}
-        {product.variants.length > 1 && (
-          <div className="mt-6">
-            <p className="mb-3 text-center text-sm font-bold text-[#4a4436]">
-              {t.model} — {product.variants.length} {t.available}
-            </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              {product.variants.map((v) => (
-                <button
-                  key={v.key}
-                  onClick={() => {
-                    setVariantKey(v.key);
-                    setGalleryIdx(0);
-                    document.getElementById("photo")?.scrollIntoView({ behavior: "smooth", block: "start" });
-                  }}
-                  className="w-20 shrink-0"
-                >
-                  <img
-                    src={img(v.img, 200)}
-                    alt={tr(v.label)}
-                    className={`aspect-square w-full rounded-2xl object-cover shadow-sm transition ${
-                      variantKey === v.key ? "ring-2 ring-[var(--gold)]" : "opacity-90 hover:opacity-100"
-                    }`}
-                    loading="lazy"
-                  />
-                  <span className="mt-1 block text-center text-[11px] font-semibold text-[#6b6353]">{tr(v.label)}</span>
-                </button>
-              ))}
-            </div>
+      <section className="mx-auto grid max-w-[1240px] grid-cols-2 gap-6 px-4 py-10 text-center md:grid-cols-4 lg:px-8">
+        {[
+          ["💵", t.cod, t.codDesc],
+          ["📦", t.openBox, t.openBoxDesc],
+          ["🚚", t.freeShip, "24h — 72h"],
+          ["💬", t.support, t.supportDesc],
+        ].map(([e, ti, de], i) => (
+          <div key={i} className="flex flex-col items-center gap-1">
+            <span className="text-2xl">{e}</span>
+            <span className="text-sm font-bold text-[#4a4436]">{ti}</span>
+            <span className="text-xs text-[#8a8172]">{de}</span>
           </div>
-        )}
-
-        <div className="mt-8 text-center">
-          <button onClick={goToForm} className="rounded-full gold-bg px-8 py-4 text-lg font-black text-white shadow-xl">
-            {t.cta} — {total} {t.dh}
-          </button>
-        </div>
+        ))}
       </section>
 
-      {/* ═══ BÉNÉFICES — 4 cartes courtes ═══ */}
-      <section className="border-y border-[#e7ddca] bg-white/60 py-10">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-3 px-4 md:grid-cols-4">
-          {product.benefits.map((b, i) => (
-            <div key={i} className="rounded-2xl border border-[#f0e8d8] bg-white p-4 text-center shadow-sm">
-              <div className="mb-1.5 text-3xl">{b.icon}</div>
-              <h3 className="font-display text-sm font-bold leading-tight">{tr(b.title)}</h3>
-            </div>
-          ))}
-        </div>
-        <div className="mx-auto mt-5 max-w-3xl px-4">
-          <p className="text-center text-sm text-[#6b6353]">{tr(product.subheadline)}</p>
+      {/* ═══ BÉNÉFICES ═══ */}
+      <section className="border-y border-[#e7ddca] bg-white/60 py-12">
+        <div className="mx-auto max-w-[1240px] px-4 lg:px-8">
+          <h2 className="font-display mb-8 text-center text-[28px] font-bold tracking-tight">{t.whyTitle}</h2>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            {product.benefits.map((b, i) => (
+              <div key={i} className="rounded-[3px] border border-[#e7ddca] bg-white p-5 text-center">
+                <div className="mb-2 text-3xl">{b.icon}</div>
+                <h3 className="font-display text-[15px] font-bold leading-tight">{tr(b.title)}</h3>
+              </div>
+            ))}
+          </div>
+          <p className="mx-auto mt-6 max-w-2xl text-center text-sm leading-relaxed text-[#6b6353]">
+            {tr(product.subheadline)}
+          </p>
+          <div className="mt-7 text-center">
+            <button
+              onClick={goToForm}
+              className="rounded-[3px] bg-[#1a1613] px-10 py-4 text-[15px] font-bold tracking-wide text-white transition hover:bg-[#2c2721]"
+            >
+              {t.cta} — {total} {t.dh}
+            </button>
+          </div>
         </div>
       </section>
 
       {/* ═══ AVIS ═══ */}
-      <section id="avis" className="mx-auto max-w-6xl scroll-mt-16 px-4 py-10">
-        <div className="mb-6 flex flex-wrap items-center justify-center gap-3">
-          <span className="font-display text-4xl font-black gold-text">{product.rating.toFixed(1).replace(".", ",")}</span>
+      <section id="avis" className="mx-auto max-w-[1240px] scroll-mt-16 px-4 py-12 lg:px-8">
+        <div className="mb-7 flex flex-wrap items-center justify-center gap-3">
+          <span className="font-display text-[40px] font-bold text-[var(--gold-dark)]">
+            {product.rating.toFixed(1).replace(".", ",")}
+          </span>
           <span>
             <Stars n={5} />
             <span className="block text-xs text-[#8a8172]">{t.basedOn(product.reviewCount)}</span>
           </span>
         </div>
-        <div className="grid gap-3 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-3">
           {product.reviews.slice(0, 6).map((r, i) => (
-            <div key={i} className="rounded-2xl border border-[#f0e8d8] bg-white p-4 shadow-sm">
-              <div className="mb-1.5 flex items-center justify-between">
+            <div key={i} className="rounded-[3px] border border-[#e7ddca] bg-white p-5">
+              <div className="mb-2 flex items-center justify-between">
                 <Stars n={r.stars} />
                 <span className="text-[11px] text-[#a09889]">{tr(r.ago)}</span>
               </div>
-              <p className="mb-2 text-sm leading-relaxed text-[#4a4436]">{tr(r.text)}</p>
+              <p className="mb-3 text-sm leading-relaxed text-[#4a4436]">{tr(r.text)}</p>
               <div className="flex items-center gap-2 text-[11px]">
                 <span className="font-bold text-[var(--gold-dark)]">{tr(r.name)}</span>
                 <span className="text-[#a09889]">· {tr(r.city)}</span>
@@ -752,23 +835,21 @@ export default function ProductLP({ product }: { product: LPProduct }) {
         </div>
       </section>
 
-      {/* ═══ DÉTAILS — tout replié ═══ */}
-      <section className="mx-auto max-w-3xl px-4 pb-10">
-        <div className="space-y-2.5">
-          {/* Description */}
-          <details className="group rounded-2xl border border-[#e7ddca] bg-white px-5 py-4 [&_summary::-webkit-details-marker]:hidden">
-            <summary className="flex cursor-pointer items-center justify-between gap-3 font-bold text-[#2c2721]">
-              📖 {tr(product.story.title)}
-              <span className="shrink-0 text-xl text-[var(--gold-dark)] transition group-open:rotate-45">+</span>
+      {/* ═══ DÉTAILS REPLIÉS ═══ */}
+      <section className="mx-auto max-w-3xl px-4 pb-12">
+        <div className="divide-y divide-[#e7ddca] border-y border-[#e7ddca]">
+          <details className="group py-4 [&_summary::-webkit-details-marker]:hidden">
+            <summary className="flex cursor-pointer items-center justify-between gap-3 font-semibold text-[#1a1613]">
+              {tr(product.story.title)}
+              <span className="text-[#8a8172] transition group-open:rotate-180">⌄</span>
             </summary>
             <p className="mt-3 text-sm leading-relaxed text-[#6b6353]">{tr(product.story.body)}</p>
           </details>
 
-          {/* Contenu du colis */}
-          <details className="group rounded-2xl border border-[#e7ddca] bg-white px-5 py-4 [&_summary::-webkit-details-marker]:hidden">
-            <summary className="flex cursor-pointer items-center justify-between gap-3 font-bold text-[#2c2721]">
-              🎁 {t.includedTitle}
-              <span className="shrink-0 text-xl text-[var(--gold-dark)] transition group-open:rotate-45">+</span>
+          <details className="group py-4 [&_summary::-webkit-details-marker]:hidden">
+            <summary className="flex cursor-pointer items-center justify-between gap-3 font-semibold text-[#1a1613]">
+              {t.includedTitle}
+              <span className="text-[#8a8172] transition group-open:rotate-180">⌄</span>
             </summary>
             <ul className="mt-3 space-y-1.5">
               {product.included.map((it, i) => (
@@ -780,34 +861,17 @@ export default function ProductLP({ product }: { product: LPProduct }) {
             </ul>
           </details>
 
-          {/* Fiche produit */}
-          <details className="group rounded-2xl border border-[#e7ddca] bg-white px-5 py-4 [&_summary::-webkit-details-marker]:hidden">
-            <summary className="flex cursor-pointer items-center justify-between gap-3 font-bold text-[#2c2721]">
-              📋 {t.specsTitle}
-              <span className="shrink-0 text-xl text-[var(--gold-dark)] transition group-open:rotate-45">+</span>
-            </summary>
-            <div className="mt-3">
-              {product.specs.map((s, i) => (
-                <div key={i} className={`flex justify-between gap-4 rounded-lg px-2 py-2 text-sm ${i % 2 ? "bg-[#faf6ef]" : ""}`}>
-                  <span className="font-semibold text-[#6b6353]">{tr(s.label)}</span>
-                  <span className="text-end text-[#1a1613]">{tr(s.value)}</span>
-                </div>
-              ))}
-            </div>
-          </details>
-
-          {/* Comparatif */}
-          <details className="group rounded-2xl border border-[#e7ddca] bg-white px-5 py-4 [&_summary::-webkit-details-marker]:hidden">
-            <summary className="flex cursor-pointer items-center justify-between gap-3 font-bold text-[#2c2721]">
-              ⚖️ {t.compareTitle}
-              <span className="shrink-0 text-xl text-[var(--gold-dark)] transition group-open:rotate-45">+</span>
+          <details className="group py-4 [&_summary::-webkit-details-marker]:hidden">
+            <summary className="flex cursor-pointer items-center justify-between gap-3 font-semibold text-[#1a1613]">
+              {t.compareTitle}
+              <span className="text-[#8a8172] transition group-open:rotate-180">⌄</span>
             </summary>
             <div className="mt-3 overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
                   <tr className="bg-[#1a1613] text-white">
                     <th className="p-2 text-start"></th>
-                    <th className="p-2 text-center font-black">{t.compareUs}</th>
+                    <th className="p-2 text-center font-bold">{t.compareUs}</th>
                     <th className="p-2 text-center font-semibold text-white/70">{t.compareThem}</th>
                   </tr>
                 </thead>
@@ -815,8 +879,14 @@ export default function ProductLP({ product }: { product: LPProduct }) {
                   {t.compareRows.map((row, i) => (
                     <tr key={i} className={i % 2 ? "bg-[#faf6ef]" : ""}>
                       <td className="p-2 font-semibold text-[#4a4436]">{row[0]}</td>
-                      <td className="p-2 text-center"><span className="me-1 text-green-600">✓</span>{row[1]}</td>
-                      <td className="p-2 text-center text-[#a09889]"><span className="me-1 text-red-400">✕</span>{row[2]}</td>
+                      <td className="p-2 text-center">
+                        <span className="me-1 text-green-600">✓</span>
+                        {row[1]}
+                      </td>
+                      <td className="p-2 text-center text-[#a09889]">
+                        <span className="me-1 text-red-400">✕</span>
+                        {row[2]}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -824,22 +894,20 @@ export default function ProductLP({ product }: { product: LPProduct }) {
             </div>
           </details>
 
-          {/* FAQ */}
           {product.faq.map((f, i) => (
-            <details key={i} className="group rounded-2xl border border-[#e7ddca] bg-white px-5 py-4 [&_summary::-webkit-details-marker]:hidden">
-              <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm font-bold text-[#2c2721]">
+            <details key={i} className="group py-4 [&_summary::-webkit-details-marker]:hidden">
+              <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-[#1a1613]">
                 {tr(f.q)}
-                <span className="shrink-0 text-xl text-[var(--gold-dark)] transition group-open:rotate-45">+</span>
+                <span className="text-[#8a8172] transition group-open:rotate-180">⌄</span>
               </summary>
               <p className="mt-3 text-sm leading-relaxed text-[#6b6353]">{tr(f.a)}</p>
             </details>
           ))}
         </div>
 
-        {/* Garanties */}
-        <div className="mt-6 rounded-2xl border border-[#e7ddca] bg-white p-5">
-          <h3 className="font-display mb-3 text-center font-bold">{t.guaranteeTitle}</h3>
-          <ul className="space-y-2">
+        <div className="mt-8 rounded-[3px] border border-[#e7ddca] bg-white p-6">
+          <h3 className="font-display mb-4 text-center text-lg font-bold">{t.guaranteeTitle}</h3>
+          <ul className="space-y-2.5">
             {t.guarantee.map(([e, txt], i) => (
               <li key={i} className="flex items-center gap-3 text-sm text-[#4a4436]">
                 <span className="text-lg">{e}</span>
@@ -847,29 +915,33 @@ export default function ProductLP({ product }: { product: LPProduct }) {
               </li>
             ))}
           </ul>
-          <button onClick={goToForm} className="mt-4 w-full rounded-full gold-bg py-3.5 font-black text-white shadow-lg">
+          <button
+            onClick={goToForm}
+            className="mt-5 w-full rounded-[3px] bg-[#1a1613] py-4 text-[15px] font-bold tracking-wide text-white transition hover:bg-[#2c2721]"
+          >
             {t.cta} — {total} {t.dh}
           </button>
         </div>
       </section>
 
-      <footer className="py-8 text-center text-sm text-[#8a8172]">
+      <footer className="border-t border-[#e7ddca] py-8 text-center text-sm text-[#8a8172]">
         © {new Date().getFullYear()} Maison d&apos;Or · {t.cod}
       </footer>
 
       {/* ═══ BARRE COLLANTE ═══ */}
-      <div dir={dir} className="fixed inset-x-0 bottom-0 z-50 border-t border-[#e7ddca] bg-white/95 px-3 py-2.5 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur">
-        <div className="mx-auto flex max-w-lg items-center gap-2">
-          <a href={waLink()} target="_blank" rel="noopener" aria-label="WhatsApp" className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#25D366] text-white">
-            <svg viewBox="0 0 32 32" className="h-6 w-6 fill-current">
-              <path d="M16 3C9.4 3 4 8.4 4 15c0 2.1.6 4.2 1.6 6L4 29l8.2-1.6c1.7.9 3.7 1.4 5.8 1.4 6.6 0 12-5.4 12-12S22.6 3 16 3zm0 22c-1.8 0-3.6-.5-5.1-1.4l-.4-.2-4.9 1 1-4.8-.3-.4C5.5 18.6 5 16.8 5 15 5 9 10 4 16 4s11 5 11 11-5 10-11 10zm6.1-7.8c-.3-.2-2-1-2.3-1.1-.3-.1-.5-.2-.8.2s-.9 1.1-1.1 1.3c-.2.2-.4.2-.7.1-1.8-.9-3-1.6-4.2-3.6-.3-.5.3-.5.9-1.6.1-.2 0-.4 0-.6s-.8-1.9-1-2.6c-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4-.3.4-1.2 1.2-1.2 2.9s1.2 3.4 1.4 3.6c.2.2 2.5 3.8 6 5.3 2.2.9 3 1 4.1.9.7-.1 2-.8 2.3-1.6.3-.8.3-1.5.2-1.6-.1-.2-.3-.3-.6-.4z" />
-            </svg>
-          </a>
-          <button onClick={goToForm} className="flex flex-1 items-center justify-between rounded-full gold-bg px-5 py-3 text-white shadow-lg">
-            <span className="font-bold">{t.ctaShort}</span>
-            <span className="font-display font-black">{total} {t.dh}</span>
-          </button>
-        </div>
+      <div
+        dir={dir}
+        className="fixed inset-x-0 bottom-0 z-50 border-t border-[#e7ddca] bg-white/95 px-3 py-2.5 backdrop-blur"
+      >
+        <button
+          onClick={goToForm}
+          className="mx-auto flex w-full max-w-lg items-center justify-between rounded-[3px] bg-[#1a1613] px-6 py-3.5 text-white"
+        >
+          <span className="font-bold tracking-wide">{t.ctaShort}</span>
+          <span className="font-display text-lg font-bold">
+            {total} {t.dh}
+          </span>
+        </button>
       </div>
     </div>
   );
