@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { put } from "@vercel/blob";
+import { ordersStore } from "@/lib/store";
 import { FORCELOG_CITIES } from "@/lib/cities";
 import { buildOrderEmailHtml, type EmailItem } from "@/lib/order-email";
 import { pushNtfy } from "@/lib/notify";
@@ -155,17 +155,13 @@ async function sendOrderEmail(args: {
    4. Vercel Blob — journal des commandes
    ───────────────────────────────────────────── */
 async function logToBlob(row: Record<string, unknown>) {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    console.log("ORDER (blob non configuré):", row);
-    return;
+  try {
+    const key = String(row.orderNum || `${Date.now()}-${Math.floor(Math.random() * 1e6)}`);
+    await ordersStore().setJSON(key, row);
+  } catch (e) {
+    // non bloquant : la commande reste prise (Forcelog + email) même si le journal échoue
+    console.error("Netlify Blobs (order) failed:", e);
   }
-  const key = `orders/${Date.now()}-${Math.floor(Math.random() * 1e6)}.json`;
-  await put(key, JSON.stringify(row), {
-    access: "public",
-    contentType: "application/json",
-    token: process.env.BLOB_READ_WRITE_TOKEN,
-    addRandomSuffix: false,
-  });
 }
 
 /* ─────────────────────────────────────────────

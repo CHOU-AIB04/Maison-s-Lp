@@ -1,48 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { list, put } from "@vercel/blob";
+import { ordersStore, statusStore } from "@/lib/store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const STATUS_PREFIX = "order-status";
 const VALID = ["new", "confirmed", "shipped", "delivered", "cancelled"] as const;
 type Status = (typeof VALID)[number];
+const STATUS_KEY = "map";
 
 function authOk(req: NextRequest) {
   const k = req.nextUrl.searchParams.get("k");
   return process.env.ORDERS_KEY && k === process.env.ORDERS_KEY;
 }
 
-/** Carte { orderId: statut } stockée dans un blob dédié (overlay, ne touche pas les commandes). */
-async function getStatusMap(token?: string): Promise<Record<string, Status>> {
+async function getStatusMap(): Promise<Record<string, Status>> {
   try {
-    const { blobs } = await list({ prefix: STATUS_PREFIX, token, limit: 100 });
-    if (!blobs.length) return {};
-    const latest = blobs.sort(
-      (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
-    )[0];
-    const r = await fetch(latest.url, { cache: "no-store" });
-    return r.ok ? await r.json() : {};
+    return ((await statusStore().get(STATUS_KEY, { type: "json" })) as Record<string, Status>) || {};
   } catch {
     return {};
-  }
-}
-
-async function saveStatusMap(map: Record<string, Status>, token?: string) {
-  const created = await put(`${STATUS_PREFIX}.json`, JSON.stringify(map), {
-    access: "public",
-    contentType: "application/json",
-    addRandomSuffix: true,
-    token,
-  });
-  // purge les anciennes versions
-  try {
-    const { blobs } = await list({ prefix: STATUS_PREFIX, token, limit: 100 });
-    const { del } = await import("@vercel/blob");
-    const old = blobs.filter((b) => b.url !== created.url).map((b) => b.url);
-    if (old.length) await del(old, { token });
-  } catch {
-    /* sans conséquence */
   }
 }
 
@@ -50,25 +25,16 @@ export async function GET(req: NextRequest) {
   if (!authOk(req)) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
-  const token = process.env.BLOB_READ_WRITE_TOKEN;
-  if (!token) {
-    return NextResponse.json(
-      { ok: false, error: "no_blob_token", hint: "BLOB_READ_WRITE_TOKEN manquant sur Netlify", orders: [], count: 0 },
-      { status: 200 }
-    );
-  }
   try {
-    const [listRes, statusMap] = await Promise.all([
-      list({ prefix: "orders/", token, limit: 1000 }),
-      getStatusMap(token),
-    ]);
+    const store = ordersStore();
+    const [{ blobs }, statusMap] = await Promise.all([store.list(), getStatusMap()]);
 
     const raw = await Promise.all(
-      listRes.blobs.map(async (b) => {
+      blobs.map(async (b) => {
         try {
-          const r = await fetch(b.url, { cache: "no-store" });
-          const o = await r.json();
-          const id = o.orderNum || b.pathname;
+          const o = (await store.get(b.key, { type: "json" })) as Record<string, unknown> | null;
+          if (!o) return null;
+          const id = String(o.orderNum || b.key);
           return { ...o, id, status: statusMap[id] || "new" };
         } catch {
           return null;
@@ -76,7 +42,9 @@ export async function GET(req: NextRequest) {
       })
     );
 
-    const orders = raw.filter(Boolean).sort((a, b) => (a.date < b.date ? 1 : -1));
+    const orders = raw
+      .filter(Boolean)
+      .sort((a, b) => (String((a as { date?: string }).date) < String((b as { date?: string }).date) ? 1 : -1));
     return NextResponse.json({ ok: true, count: orders.length, orders });
   } catch (e) {
     return NextResponse.json(
@@ -100,9 +68,15 @@ export async function PATCH(req: NextRequest) {
   if (!id || !status || !VALID.includes(status as Status)) {
     return NextResponse.json({ ok: false, error: "bad_params" }, { status: 422 });
   }
-  const token = process.env.BLOB_READ_WRITE_TOKEN;
-  const map = await getStatusMap(token);
-  map[id] = status as Status;
-  await saveStatusMap(map, token);
-  return NextResponse.json({ ok: true, id, status });
+  try {
+    const map = await getStatusMap();
+    map[id] = status as Status;
+    await statusStore().setJSON(STATUS_KEY, map);
+    return NextResponse.json({ ok: true, id, status });
+  } catch (e) {
+    return NextResponse.json(
+      { ok: false, error: "blob_error", message: e instanceof Error ? e.message : String(e) },
+      { status: 500 }
+    );
+  }
 }
