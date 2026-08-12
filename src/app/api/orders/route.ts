@@ -80,3 +80,37 @@ export async function PATCH(req: NextRequest) {
     );
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  if (!authOk(req)) {
+    return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
+  }
+  let body: { id?: string };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ ok: false, error: "bad_json" }, { status: 400 });
+  }
+  const id = body.id;
+  if (!id) {
+    return NextResponse.json({ ok: false, error: "bad_params" }, { status: 422 });
+  }
+  try {
+    await ordersStore().delete(String(id));
+    try {
+      const map = await getStatusMap();
+      if (map[id]) {
+        delete map[id];
+        await statusStore().setJSON(STATUS_KEY, map);
+      }
+    } catch {
+      /* sans conséquence */
+    }
+    return NextResponse.json({ ok: true, id });
+  } catch (e) {
+    return NextResponse.json(
+      { ok: false, error: "blob_error", message: e instanceof Error ? e.message : String(e) },
+      { status: 500 }
+    );
+  }
+}

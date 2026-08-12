@@ -75,6 +75,21 @@ export default function AdminApp({ apiKey, onLogout }: { apiKey: string; onLogou
     }
   };
 
+  const deleteOrder = async (id: string) => {
+    if (!window.confirm("Supprimer définitivement cette commande ?")) return;
+    setBusy(id);
+    setOrders((o) => o?.filter((x) => x.id !== id) || o);
+    try {
+      await fetch(`/api/orders?k=${encodeURIComponent(k)}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+    } finally {
+      setBusy("");
+    }
+  };
+
   const counts = useMemo(() => {
     const c: Record<string, number> = { all: orders?.length || 0 };
     STATUSES.forEach((s) => (c[s.value] = orders?.filter((o) => o.status === s.value).length || 0));
@@ -111,7 +126,7 @@ export default function AdminApp({ apiKey, onLogout }: { apiKey: string; onLogou
       {orders === null ? (
         <div className="p-10 text-center text-[#8a8172]">Chargement…</div>
       ) : tab === "commandes" ? (
-        <OrdersPanel orders={shown} counts={counts} filter={filter} setFilter={setFilter} setStatus={setStatus} busy={busy} />
+        <OrdersPanel orders={shown} counts={counts} filter={filter} setFilter={setFilter} setStatus={setStatus} deleteOrder={deleteOrder} busy={busy} />
       ) : (
         <DashboardPanel orders={orders} />
       )}
@@ -120,10 +135,10 @@ export default function AdminApp({ apiKey, onLogout }: { apiKey: string; onLogou
 }
 
 /* ═══════════════ COMMANDES ═══════════════ */
-function OrdersPanel({ orders, counts, filter, setFilter, setStatus, busy }: {
+function OrdersPanel({ orders, counts, filter, setFilter, setStatus, deleteOrder, busy }: {
   orders: Order[]; counts: Record<string, number>;
   filter: "all" | Status; setFilter: (f: "all" | Status) => void;
-  setStatus: (id: string, s: Status) => void; busy: string;
+  setStatus: (id: string, s: Status) => void; deleteOrder: (id: string) => void; busy: string;
 }) {
   return (
     <>
@@ -192,6 +207,10 @@ function OrdersPanel({ orders, counts, filter, setFilter, setStatus, busy }: {
                       {s.label}
                     </button>
                   ))}
+                  <button disabled={busy === o.id} onClick={() => deleteOrder(o.id)}
+                    className="ms-auto rounded-full border border-red-200 bg-white px-3 py-1 text-xs font-bold text-red-600 transition hover:bg-red-50 disabled:opacity-50">
+                    🗑 Supprimer
+                  </button>
                 </div>
               </div>
             );
