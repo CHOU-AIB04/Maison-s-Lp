@@ -24,6 +24,7 @@ type Order = {
   source?: string;
   utmSource?: string;
   utmContent?: string;
+  utm?: Record<string, string>;
 };
 
 const STATUSES: { value: Status; label: string; fg: string; bg: string; dot: string }[] = [
@@ -161,9 +162,20 @@ function OrdersPanel({ orders, counts, filter, setFilter, setStatus, busy }: {
                       {o.variant && <span className="text-[#8a8172]"> · {o.variant}</span>}
                       <span className="text-[#8a8172]"> · ×{o.qty}</span>
                     </div>
-                    {(o.utmContent || o.source) && (
-                      <div className="mt-1 text-xs text-[#b3aa98]">src: {o.source || "—"}{o.utmContent ? ` · ad ${o.utmContent}` : ""}</div>
-                    )}
+                    {(() => {
+                      const u = o.utm || {};
+                      const parts = [
+                        u.utm_source && `src: ${u.utm_source}`,
+                        u.utm_campaign && `camp: ${u.utm_campaign}`,
+                        (u.campaign_id || u.utm_id) && `camp_id: ${u.campaign_id || u.utm_id}`,
+                        u.adset_id && `adset: ${u.adset_id}`,
+                        (u.ad_id || u.utm_content || o.utmContent) && `ad: ${u.ad_id || u.utm_content || o.utmContent}`,
+                      ].filter(Boolean);
+                      if (!parts.length && o.source) parts.push(`src: ${o.source}`);
+                      return parts.length ? (
+                        <div className="mt-1 break-all font-mono text-[11px] text-[#b3aa98]">{parts.join(" · ")}</div>
+                      ) : null;
+                    })()}
                   </div>
                   <div className="text-end">
                     <div className="font-display text-xl font-black gold-text">{money(o.total)}</div>

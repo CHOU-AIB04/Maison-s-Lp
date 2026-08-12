@@ -18,6 +18,12 @@ import { FORCELOG_CITIES } from "@/lib/cities";
 
 type Status = "idle" | "sending" | "done";
 
+/** UTM + IDs de campagne Meta captés dans l'URL de l'annonce. */
+const UTM_KEYS = [
+  "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id",
+  "ad_id", "adset_id", "campaign_id", "fbclid",
+] as const;
+
 /* ── Meta Pixel ─────────────────────────────────────────── */
 type Fbq = (...args: unknown[]) => void;
 const track = (event: string, data?: Record<string, unknown>) => {
@@ -71,7 +77,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
   const [err, setErr] = useState("");
   const [orderNum, setOrderNum] = useState("");
   const [upsellState, setUpsellState] = useState<"offer" | "adding" | "added" | "declined">("offer");
-  const [utm, setUtm] = useState({ source: "", content: "" });
+  const [utm, setUtm] = useState<Record<string, string>>({});
   const [revIdx, setRevIdx] = useState(0);
   const touchX = useRef<number | null>(null);
   const checkoutStarted = useRef(false);
@@ -95,7 +101,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
     setDelivery({ a: fmt(a), b: fmt(b) });
   }, [lang]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /** utm_source / utm_content : lus dans l'URL, conservés pour la session. */
+  /** UTM + IDs Meta (campaign/adset/ad) : lus dans l'URL, conservés pour la session. */
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
     const pick = (key: string) => {
@@ -107,7 +113,12 @@ export default function ProductLP({ product }: { product: LPProduct }) {
         return fromUrl ?? "";
       }
     };
-    setUtm({ source: pick("utm_source"), content: pick("utm_content") });
+    const collected: Record<string, string> = {};
+    UTM_KEYS.forEach((key) => {
+      const v = pick(key);
+      if (v) collected[key] = v;
+    });
+    setUtm(collected);
   }, []);
 
   useEffect(() => {
@@ -213,8 +224,9 @@ export default function ProductLP({ product }: { product: LPProduct }) {
           qty,
           lang,
           source: product.slug,
-          utmSource: utm.source,
-          utmContent: utm.content,
+          utm,
+          utmSource: utm.utm_source || "",
+          utmContent: utm.utm_content || "",
         }),
       });
       const json = await res.json();
@@ -278,8 +290,9 @@ export default function ProductLP({ product }: { product: LPProduct }) {
           qty: 1,
           lang,
           source: `${product.slug}-upsell`,
-          utmSource: utm.source,
-          utmContent: utm.content,
+          utm,
+          utmSource: utm.utm_source || "",
+          utmContent: utm.utm_content || "",
         }),
       });
       const json = await res.json();
@@ -598,8 +611,9 @@ export default function ProductLP({ product }: { product: LPProduct }) {
                 {t.formTitle}
               </p>
 
-              <input type="hidden" name="utm_source" value={utm.source} readOnly />
-              <input type="hidden" name="utm_content" value={utm.content} readOnly />
+              {UTM_KEYS.map((key) => (
+                <input key={key} type="hidden" name={key} value={utm[key] || ""} readOnly />
+              ))}
 
               <input id="f-name" className="field" placeholder={t.fName} value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
               <input className="field" type="tel" inputMode="tel" placeholder={t.fPhone} value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" />

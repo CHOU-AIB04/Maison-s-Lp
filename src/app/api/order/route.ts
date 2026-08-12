@@ -35,6 +35,7 @@ type OrderPayload = {
   source?: string;
   utmSource?: string;
   utmContent?: string;
+  utm?: Record<string, string>;
 };
 
 const EMAIL_TO = (process.env.ORDER_EMAIL_TO || "chouaibalx@gmail.com,m.eladraouy@gmail.com")
@@ -216,6 +217,14 @@ export async function POST(req: NextRequest) {
   const source = body.source || body.model || "LP";
   const utmSource = (body.utmSource || "").slice(0, 60);
   const utmContent = (body.utmContent || "").slice(0, 60);
+  const utm =
+    body.utm && typeof body.utm === "object"
+      ? Object.fromEntries(
+          Object.entries(body.utm)
+            .slice(0, 15)
+            .map(([kk, vv]) => [String(kk).slice(0, 30), String(vv).slice(0, 200)])
+        )
+      : {};
 
   const row = {
     date: new Date().toISOString(),
@@ -240,6 +249,7 @@ export async function POST(req: NextRequest) {
     source,
     utmSource,
     utmContent,
+    utm,
   };
 
   // ── Forcelog : bloquant (si ça échoue, on n'annonce pas la commande comme prise)
