@@ -238,6 +238,7 @@ export async function POST(req: NextRequest) {
     model: body.model || "",
     variant: body.variant || items[0]?.variant || "",
     color: body.variant || items[0]?.variant || "",
+    image: items[0]?.image || "",
     qty: body.qty ?? items.reduce((s, i) => s + i.quantity, 0),
     price: items[0]?.price ?? 0,
     subtotal,

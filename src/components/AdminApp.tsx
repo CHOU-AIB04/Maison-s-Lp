@@ -15,6 +15,7 @@ type Order = {
   product: string;
   variant?: string;
   color?: string;
+  image?: string;
   qty: number;
   subtotal?: number;
   discount?: number;
@@ -161,7 +162,9 @@ function OrdersPanel({ orders, counts, filter, setFilter, setStatus, deleteOrder
             return (
               <div key={o.id} className="rounded-2xl border border-[#f0e8d8] bg-white p-4 shadow-sm">
                 <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
+                  <div className="flex min-w-0 gap-3">
+                    {o.image ? <img src={o.image} alt="" className="h-14 w-14 shrink-0 rounded-xl object-cover" /> : null}
+                    <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="rounded-full px-2.5 py-0.5 text-xs font-bold" style={{ color: m.fg, background: m.bg }}>● {m.label}</span>
                       <span className="text-xs text-[#8a8172]">{fmtDate(o.date)}</span>
@@ -191,6 +194,7 @@ function OrdersPanel({ orders, counts, filter, setFilter, setStatus, deleteOrder
                         <div className="mt-1 break-all font-mono text-[11px] text-[#b3aa98]">{parts.join(" · ")}</div>
                       ) : null;
                     })()}
+                    </div>
                   </div>
                   <div className="text-end">
                     <div className="font-display text-xl font-black gold-text">{money(o.total)}</div>
