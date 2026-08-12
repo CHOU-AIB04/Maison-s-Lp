@@ -395,16 +395,24 @@ export default function ProductLP({ product }: { product: LPProduct }) {
                 −{discountPct}%
               </span>
 
-              <img
-                key={gallery[galleryIdx]}
-                src={img(gallery[galleryIdx], 900)}
-                srcSet={`${img(gallery[galleryIdx], 450)} 450w, ${img(gallery[galleryIdx], 700)} 700w, ${img(gallery[galleryIdx], 1000)} 1000w`}
-                sizes="(min-width: 1024px) 560px, 100vw"
-                alt={`${product.name.fr} — ${tr(variant.label)}`}
-                className="img-swap aspect-square w-full object-cover"
-                fetchPriority="high"
-                decoding="async"
-              />
+              <div className="relative aspect-square w-full">
+                {product.variants.map((v, k) => (
+                  <img
+                    key={v.key}
+                    src={img(v.img, 900)}
+                    srcSet={`${img(v.img, 450)} 450w, ${img(v.img, 700)} 700w, ${img(v.img, 1000)} 1000w`}
+                    sizes="(min-width: 1024px) 560px, 100vw"
+                    alt={`${product.name.fr} — ${tr(v.label)}`}
+                    loading={k === 0 ? "eager" : "lazy"}
+                    fetchPriority={k === 0 ? "high" : "low"}
+                    decoding="async"
+                    aria-hidden={galleryIdx !== k}
+                    className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-200 ease-out ${
+                      galleryIdx === k ? "opacity-100" : "opacity-0"
+                    }`}
+                  />
+                ))}
+              </div>
 
               {gallery.length > 1 && (
                 <>
@@ -463,8 +471,11 @@ export default function ProductLP({ product }: { product: LPProduct }) {
 
           {/* ── Colonne commande ───────────────────────── */}
           <div className="fade-up flex min-w-0 flex-col">
-            <h1 className="font-display order-1 mb-3 text-[34px] font-bold leading-[1.1] tracking-tight md:text-[44px]">
+            <h1 className="font-display order-1 mb-3 text-[20px] font-bold leading-[1.1] tracking-tight md:text-[44px]">
               {tr(product.name)}
+              {product.variants.length > 1 && (
+                <span className="font-normal text-[#8a8172]"> — {tr(variant.label)}</span>
+              )}
             </h1>
 
             <a href="#avis" className="order-1 mb-4 inline-flex items-center gap-2">
@@ -502,29 +513,18 @@ export default function ProductLP({ product }: { product: LPProduct }) {
                 <div className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8a8172]">
                   {t.model} — <span className="text-[#1a1613]">{tr(variant.label)}</span>
                 </div>
-                <div className="-mx-4 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden">
+                <select
+                  className="field"
+                  value={variantKey}
+                  onChange={(e) => setVariantKey(e.target.value)}
+                  aria-label={t.model}
+                >
                   {product.variants.map((v) => (
-                    <button
-                      key={v.key}
-                      onClick={() => setVariantKey(v.key)}
-                      title={tr(v.label)}
-                      aria-label={tr(v.label)}
-                      className={`h-[58px] w-[58px] shrink-0 snap-start overflow-hidden rounded-[2px] border transition ${
-                        variantKey === v.key
-                          ? "border-[#1a1613] ring-1 ring-[#1a1613]"
-                          : "border-[#e7ddca] opacity-80 hover:opacity-100"
-                      }`}
-                    >
-                      <img
-                        src={img(v.img, 130)}
-                        alt={tr(v.label)}
-                        loading="lazy"
-                        decoding="async"
-                        className="h-full w-full object-cover"
-                      />
-                    </button>
+                    <option key={v.key} value={v.key}>
+                      {tr(v.label)}
+                    </option>
                   ))}
-                </div>
+                </select>
                 {variant.desc && <p className="mt-3 text-sm leading-relaxed text-[#6b6353]">{tr(variant.desc)}</p>}
               </div>
             )}

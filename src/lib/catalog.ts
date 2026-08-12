@@ -194,8 +194,8 @@ export const PRODUCTS: LPProduct[] = [
     name: { fr: "Ensemble Tulip", ar: "طقم Tulip" },
     category: { fr: "Parures Tulip", ar: "أطقم Tulip" },
     headline: {
-      fr: "Collier + bracelet assortis — 5 modèles, un seul prix",
-      ar: "عقد + سوار متناسقين — 5 موديلات، ثمن واحد",
+      fr: "Collier + bracelet assortis — 4 modèles, un seul prix",
+      ar: "عقد + سوار متناسقين — 4 موديلات، ثمن واحد",
     },
     subheadline: {
       fr: "Parures florales serties de cristaux sur acier inoxydable plaqué or 18K ou argent rhodié. Choisissez votre modèle, on vous le livre en coffret — vous payez à la réception.",
@@ -243,20 +243,6 @@ export const PRODUCTS: LPProduct[] = [
         ],
       },
       {
-        key: "prestige",
-        label: { fr: "Prestige · Améthyste & Rosé", ar: "برستيج · أميتيست وزهري" },
-        img: "v1782485786/prod10_white_c_ffubmd.jpg",
-        desc: {
-          fr: "Le modèle le plus travaillé : deux teintes de cristaux et motifs végétaux sculptés dans la monture.",
-          ar: "الموديل الأكثر تفصيلًا: لونين من الكريستال ونقوش نباتية منحوتة فالقاعدة.",
-        },
-        gallery: [
-          "v1782485786/prod10_white_c_ffubmd.jpg",
-          "v1782146330/product_1_eufnps.png",
-          "v1782485784/prod10_black_c_fwk74g.jpg",
-        ],
-      },
-      {
         key: "doree",
         label: { fr: "Dorée · Cristal", ar: "ذهبي · كريستال" },
         img: "v1782485761/prod7_white_c_qfwvfm.jpg",
@@ -284,7 +270,7 @@ export const PRODUCTS: LPProduct[] = [
     ],
     bundles: bundlesFor(139, 30, 50),
     usps: [
-      { fr: "5 modèles au même prix", ar: "5 موديلات بنفس الثمن" },
+      { fr: "4 modèles au même prix", ar: "4 موديلات بنفس الثمن" },
       { fr: "Collier + bracelet en coffret", ar: "عقد + سوار فعلبة" },
       { fr: "Ne noircit pas, ne verdit pas", ar: "ما كيسودش وما كيخضّرش" },
       { fr: "Livraison gratuite · paiement à la réception", ar: "توصيل مجاني · الخلاص عند الاستلام" },
@@ -294,14 +280,14 @@ export const PRODUCTS: LPProduct[] = [
     story: {
       title: { fr: "Quel modèle Tulip choisir ?", ar: "شنو الموديل Tulip اللي تختاري؟" },
       body: {
-        fr: "Les cinq modèles partagent exactement la même fabrication : base en acier inoxydable, plaquage or 18K ou rhodiage argent, cristaux sertis un par un. La différence est purement esthétique. Bicolore et Prestige sont les plus habillés, avec leurs cristaux améthyste et rosé — ce sont ceux qu'on choisit pour un mariage ou un cadeau. Dorée est le plus polyvalent : cristal transparent, aucune couleur à assortir, c'est notre plus grosse vente. Argentée s'adresse à celles qui portent déjà de l'argent ou une montre en acier. Rouge est le plus affirmé, pensé pour le caftan et les soirées. Si vous hésitez, prenez Dorée : c'est celui qui se porte le plus souvent.",
-        ar: "الخمسة موديلات عندهم نفس الصناعة: قاعدة من الفولاذ المقاوم للصدأ، طلاء ذهبي 18 قيراط ولا فضي، وكريستال مرصّع حبة بحبة. الفرق غير جمالي. ثنائي اللون والبرستيج هوما الأكثر أناقة بالأميتيست والزهري — هوما اللي كيتختارو للعرس ولا للهدية. الذهبي هو الأكثر استعمالًا: كريستال شفاف، بلا لون خاصك تناسبيه، وهو الأكثر مبيعًا عندنا. الفضي لللي كتلبس الفضة ولا ماكينة ديال الفولاذ. والأحمر هو الأقوى، مصمم للقفطان والسهرات. إلى حتارتي، خدي الذهبي.",
+        fr: "Les quatre modèles partagent exactement la même fabrication : base en acier inoxydable, plaquage or 18K ou rhodiage argent, cristaux sertis un par un. La différence est purement esthétique. Bicolore est le plus habillé, avec ses cristaux améthyste en cascade — c'est celui qu'on choisit pour un mariage ou un cadeau. Dorée est le plus polyvalent : cristal transparent, aucune couleur à assortir, c'est notre plus grosse vente. Argentée s'adresse à celles qui portent déjà de l'argent ou une montre en acier. Rouge est le plus affirmé, pensé pour le caftan et les soirées. Si vous hésitez, prenez Dorée : c'est celui qui se porte le plus souvent.",
+        ar: "الأربعة موديلات عندهم نفس الصناعة: قاعدة من الفولاذ المقاوم للصدأ، طلاء ذهبي 18 قيراط ولا فضي، وكريستال مرصّع حبة بحبة. الفرق غير جمالي. ثنائي اللون هو الأكثر أناقة بالأميتيست — وهو اللي كيتختار للعرس ولا للهدية. الذهبي هو الأكثر استعمالًا: كريستال شفاف، بلا لون خاصك تناسبيه، وهو الأكثر مبيعًا عندنا. الفضي لللي كتلبس الفضة ولا ماكينة ديال الفولاذ. والأحمر هو الأقوى، مصمم للقفطان والسهرات. إلى حتارتي، خدي الذهبي.",
       },
     },
     specs: SPECS_ACIER,
     faq: [
       {
-        q: { fr: "Les 5 modèles sont-ils au même prix ?", ar: "واش الخمسة موديلات بنفس الثمن؟" },
+        q: { fr: "Les 4 modèles sont-ils au même prix ?", ar: "واش الأربعة موديلات بنفس الثمن؟" },
         a: {
           fr: "Oui, 139 dh quel que soit le modèle choisi, livraison comprise. Le pack de 2 ou 3 peut mélanger les modèles : indiquez-le simplement lors de l'appel de confirmation.",
           ar: "إيه، 139 درهم لأي موديل، والتوصيل داخل. الباك ديال 2 ولا 3 تقدري تخلطي فيه الموديلات: غير قوليها للمكلف منين نعيطو ليك باش نأكدو.",
@@ -312,16 +298,16 @@ export const PRODUCTS: LPProduct[] = [
     reviews: [
       rev("Sara B.", "سارة ب.", "Casablanca", "الدار البيضاء", "J'ai pris la Bicolore, reçue en 24h et ouverte devant le livreur. Pour 139 dh je m'attendais à moins bien 🥰", "خديت ثنائي اللون، وصلاتني ف24 ساعة وحليتها قدام الموصّل. ب139 درهم كنت كنتسنى أقل 🥰", 3),
       rev("Imane K.", "إيمان ك.", "Marrakech", "مراكش", "2 mois de port quotidien avec la Dorée, douche comprise, aucune trace de noir. J'ai repris la Rouge après.", "شهرين وأنا لابسة الذهبي كل نهار، حتى فالدوش، بلا سواد. من بعد خديت الأحمر.", 8),
-      rev("Meryem L.", "مريم ل.", "Rabat", "الرباط", "La Prestige au mariage de ma cousine : 4 personnes m'ont demandé où je l'avais achetée 😅", "البرستيج فعرس بنت عمي: 4 نسا سولوني منين شريتها 😅", 5),
+      rev("Meryem L.", "مريم ل.", "Rabat", "الرباط", "La Bicolore au mariage de ma cousine : 4 personnes m'ont demandé où je l'avais achetée 😅", "ثنائي اللون فعرس بنت عمي: 4 نسا سولوني منين شريتها 😅", 5),
       rev("Btissam O.", "ابتسام و.", "Fès", "فاس", "Enfin une parure argentée qui ne noircit pas au bout d'un mois. Ça faisait longtemps que je cherchais.", "أخيرًا طقم فضي ما كيسودش من بعد شهر. هادي مدة وأنا كنقلب.", 11),
       rev("Kenza M.", "كنزة م.", "Tanger", "طنجة", "La Rouge sur un caftan blanc, effet garanti. Le rouge est vraiment profond, pas orange.", "الأحمر على قفطان أبيض، النتيجة مضمونة. الأحمر عميق بصح، ماشي برتقالي.", 16),
-      rev("Amal S.", "أمل س.", "Agadir", "أكادير", "Pack de 2 avec ma sœur : elle a pris la Prestige, moi la Dorée. Livré ensemble, payé au livreur.", "باك ديال 2 مع ختي: هي خديت البرستيج وأنا الذهبي. وصلونا مع بعض، وخلصنا للموصّل.", 22),
+      rev("Amal S.", "أمل س.", "Agadir", "أكادير", "Pack de 2 avec ma sœur : elle a pris la Rouge, moi la Dorée. Livré ensemble, payé au livreur.", "باك ديال 2 مع ختي: هي خديت الأحمر وأنا الذهبي. وصلونا مع بعض، وخلصنا للموصّل.", 22),
     ],
     upsell: "ensemble-swan",
     seo: {
-      title: "Ensemble Tulip 🌷 Collier + Bracelet — 5 modèles, 139 dh | Maison d'Or",
+      title: "Ensemble Tulip 🌷 Collier + Bracelet — 4 modèles, 139 dh | Maison d'Or",
       description:
-        "Parure Tulip : collier + bracelet sertis de cristaux, 5 modèles au choix (Bicolore, Prestige, Dorée, Argentée, Rouge). Ne ternit pas, hypoallergénique. Livraison gratuite au Maroc, paiement à la livraison.",
+        "Parure Tulip : collier + bracelet sertis de cristaux, 4 modèles au choix (Rouge, Bicolore, Dorée, Argentée). Ne ternit pas, hypoallergénique. Livraison gratuite au Maroc, paiement à la livraison.",
     },
   },
 
