@@ -511,9 +511,9 @@ export default function ProductLP({ product }: { product: LPProduct }) {
               </span>
             </div>
 
-            <ul className="order-5 mb-6 space-y-2 lg:order-2">
+            <ul className="order-5 mb-6 space-y-3.5 lg:order-2">
               {product.usps.map((u, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-[15px] leading-snug text-[#4a4436]">
+                <li key={i} className="flex items-start gap-2.5 text-[15px] leading-relaxed text-[#4a4436]">
                   <span>{["✨", "💧", "🌿", "🎁"][i % 4]}</span>
                   <span>{tr(u)}</span>
                 </li>
@@ -657,14 +657,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
               {err && <p className="rounded-[3px] bg-red-50 px-4 py-2.5 text-sm font-bold text-red-600">{err}</p>}
 
               <div className="flex items-center justify-between border-t border-[#f0e8d8] pt-3 text-sm">
-                <span className="font-semibold">
-                  {t.total}
-                  {discount > 0 && (
-                    <span className="ms-2 text-xs font-bold text-green-700">
-                      − {discount} {t.dh}
-                    </span>
-                  )}
-                </span>
+                <span className="font-semibold">{t.total}</span>
                 <span className="font-display text-[26px] font-bold text-[var(--gold-dark)]">
                   {total} {t.dh}
                 </span>
