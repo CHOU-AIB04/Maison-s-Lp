@@ -11,7 +11,6 @@ import {
   bundleTotal,
   bundleSaving,
   getProduct,
-  variantGallery,
 } from "@/lib/catalog";
 import { UI } from "@/lib/ui-copy";
 import { gtmEvent, type GtmItem } from "@/lib/gtm";
@@ -47,7 +46,6 @@ export default function ProductLP({ product }: { product: LPProduct }) {
   /* ── Sélection ───────────────────────────────────────── */
   const [variantKey, setVariantKey] = useState(product.variants[0].key);
   const [bundleIdx, setBundleIdx] = useState(0);
-  const [galleryIdx, setGalleryIdx] = useState(0);
 
   const variant = product.variants.find((v) => v.key === variantKey) || product.variants[0];
   const bundle = product.bundles[bundleIdx];
@@ -57,10 +55,11 @@ export default function ProductLP({ product }: { product: LPProduct }) {
   const discount = bundleSaving(bundle, product.price);
   const discountPct = Math.round((1 - product.price / product.compareAt) * 100);
 
-  /** Photos du modèle sélectionné (chaque variante a sa propre galerie) */
-  const gallery = useMemo(() => variantGallery(product, variant), [product, variant]);
-
-  useEffect(() => setGalleryIdx(0), [variantKey]);
+  /** Une photo par modèle : le diaporama fait défiler les variantes. */
+  const gallery = useMemo(() => product.variants.map((v) => v.img), [product.variants]);
+  const galleryIdx = Math.max(0, product.variants.findIndex((v) => v.key === variantKey));
+  const goToVariant = (i: number) =>
+    setVariantKey(product.variants[(i + product.variants.length) % product.variants.length].key);
 
   /* ── Formulaire ──────────────────────────────────────── */
   const [name, setName] = useState("");
@@ -86,7 +85,6 @@ export default function ProductLP({ product }: { product: LPProduct }) {
 
   /* ── Éléments dynamiques (client-only) ───────────────── */
   const [delivery, setDelivery] = useState<{ a: string; b: string } | null>(null);
-  const [countdown, setCountdown] = useState("");
 
   useEffect(() => {
     const fmt = (d: Date) => `${t.days[d.getDay()]} ${d.getDate()} ${t.months[d.getMonth()]}`;
@@ -96,19 +94,6 @@ export default function ProductLP({ product }: { product: LPProduct }) {
     b.setDate(b.getDate() + 4);
     setDelivery({ a: fmt(a), b: fmt(b) });
   }, [lang]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    const end = Date.now() + (20 * 60 + Math.floor(Math.random() * 600)) * 1000;
-    const tick = () => {
-      const left = Math.max(0, end - Date.now());
-      setCountdown(
-        `${String(Math.floor(left / 60000)).padStart(2, "0")}:${String(Math.floor((left % 60000) / 1000)).padStart(2, "0")}`
-      );
-    };
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, []);
 
   /** utm_source / utm_content : lus dans l'URL, conservés pour la session. */
   useEffect(() => {
@@ -180,8 +165,8 @@ export default function ProductLP({ product }: { product: LPProduct }) {
     setTimeout(() => document.getElementById("f-name")?.focus(), 500);
   };
 
-  const prevPhoto = () => setGalleryIdx((i) => (i - 1 + gallery.length) % gallery.length);
-  const nextPhoto = () => setGalleryIdx((i) => (i + 1) % gallery.length);
+  const prevPhoto = () => goToVariant(galleryIdx - 1);
+  const nextPhoto = () => goToVariant(galleryIdx + 1);
 
   const waLink = () => {
     const msg =
@@ -395,7 +380,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
       <section className="mx-auto max-w-[1240px] px-4 pb-10 pt-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
           {/* ── Diaporama ─────────────────────────────── */}
-          <div id="photo" className="fade-up scroll-mt-20 lg:sticky lg:top-24 lg:self-start">
+          <div id="photo" className="fade-up min-w-0 scroll-mt-20 lg:sticky lg:top-24 lg:self-start">
             <div
               className="group relative overflow-hidden rounded-[2px] bg-white shadow-[0_2px_24px_rgba(26,22,19,0.07)]"
               onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
@@ -412,10 +397,13 @@ export default function ProductLP({ product }: { product: LPProduct }) {
 
               <img
                 key={gallery[galleryIdx]}
-                src={img(gallery[galleryIdx], 1000)}
+                src={img(gallery[galleryIdx], 900)}
+                srcSet={`${img(gallery[galleryIdx], 450)} 450w, ${img(gallery[galleryIdx], 700)} 700w, ${img(gallery[galleryIdx], 1000)} 1000w`}
+                sizes="(min-width: 1024px) 560px, 100vw"
                 alt={`${product.name.fr} — ${tr(variant.label)}`}
                 className="img-swap aspect-square w-full object-cover"
                 fetchPriority="high"
+                decoding="async"
               />
 
               {gallery.length > 1 && (
@@ -455,17 +443,18 @@ export default function ProductLP({ product }: { product: LPProduct }) {
 
             {/* Miniatures */}
             {gallery.length > 1 && (
-              <div className="mt-3 flex gap-2.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {gallery.map((g, i) => (
+              <div className="mt-3 flex w-full snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {product.variants.map((v, i) => (
                   <button
-                    key={g}
-                    onClick={() => setGalleryIdx(i)}
-                    aria-label={`Photo ${i + 1}`}
-                    className={`h-[74px] w-[74px] shrink-0 overflow-hidden rounded-[2px] border transition ${
+                    key={v.key}
+                    onClick={() => setVariantKey(v.key)}
+                    aria-label={tr(v.label)}
+                    title={tr(v.label)}
+                    className={`h-[64px] w-[64px] shrink-0 snap-start overflow-hidden rounded-[2px] border transition sm:h-[74px] sm:w-[74px] ${
                       galleryIdx === i ? "border-[#1a1613]" : "border-[#e7ddca] opacity-70 hover:opacity-100"
                     }`}
                   >
-                    <img src={img(g, 220)} alt="" className="h-full w-full object-cover" />
+                    <img src={img(v.img, 170)} alt={tr(v.label)} loading="lazy" decoding="async" className="h-full w-full object-cover" />
                   </button>
                 ))}
               </div>
@@ -473,19 +462,12 @@ export default function ProductLP({ product }: { product: LPProduct }) {
           </div>
 
           {/* ── Colonne commande ───────────────────────── */}
-          <div className="fade-up">
-            {countdown && (
-              <div className="mb-4 inline-flex items-center gap-2 rounded-[2px] border border-[var(--gold)] px-3.5 py-1.5 text-[12px] font-bold tracking-wide text-[var(--gold-dark)]">
-                <span>⏳</span>
-                {t.saleEnds} · <span className="font-mono tabular-nums">{countdown}</span>
-              </div>
-            )}
-
-            <h1 className="font-display mb-3 text-[34px] font-bold leading-[1.1] tracking-tight md:text-[44px]">
+          <div className="fade-up flex min-w-0 flex-col">
+            <h1 className="font-display order-1 mb-3 text-[34px] font-bold leading-[1.1] tracking-tight md:text-[44px]">
               {tr(product.name)}
             </h1>
 
-            <a href="#avis" className="mb-4 inline-flex items-center gap-2">
+            <a href="#avis" className="order-1 mb-4 inline-flex items-center gap-2">
               <Stars n={5} />
               <span className="text-sm font-semibold text-[#5b5346]">{product.rating.toFixed(1).replace(".", ",")}</span>
               <span className="text-sm text-[#8a8172] underline underline-offset-2">
@@ -493,7 +475,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
               </span>
             </a>
 
-            <div className="mb-5 flex flex-wrap items-baseline gap-3">
+            <div className="order-1 mb-5 flex flex-wrap items-baseline gap-3">
               <span className="font-display text-[40px] md:text-[55px] font-extrabold text-black">
                 {product.price},00 {t.dh}
               </span>
@@ -505,7 +487,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
               </span>
             </div>
 
-            <ul className="mb-6 space-y-2">
+            <ul className="order-5 mb-6 space-y-2 lg:order-2">
               {product.usps.map((u, i) => (
                 <li key={i} className="flex items-start gap-2.5 text-[15px] leading-snug text-[#4a4436]">
                   <span>{["✨", "💧", "🌿", "🎁"][i % 4]}</span>
@@ -516,24 +498,30 @@ export default function ProductLP({ product }: { product: LPProduct }) {
 
             {/* Modèle */}
             {product.variants.length > 1 && (
-              <div className="mb-6">
+              <div className="order-2 mb-6 lg:order-3">
                 <div className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8a8172]">
                   {t.model} — <span className="text-[#1a1613]">{tr(variant.label)}</span>
                 </div>
-                <div className="flex flex-wrap gap-2.5">
+                <div className="-mx-4 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden">
                   {product.variants.map((v) => (
                     <button
                       key={v.key}
                       onClick={() => setVariantKey(v.key)}
                       title={tr(v.label)}
                       aria-label={tr(v.label)}
-                      className={`h-[58px] w-[58px] overflow-hidden rounded-[2px] border transition ${
+                      className={`h-[58px] w-[58px] shrink-0 snap-start overflow-hidden rounded-[2px] border transition ${
                         variantKey === v.key
                           ? "border-[#1a1613] ring-1 ring-[#1a1613]"
                           : "border-[#e7ddca] opacity-80 hover:opacity-100"
                       }`}
                     >
-                      <img src={img(v.img, 160)} alt="" className="h-full w-full object-cover" />
+                      <img
+                        src={img(v.img, 130)}
+                        alt={tr(v.label)}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover"
+                      />
                     </button>
                   ))}
                 </div>
@@ -542,7 +530,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
             )}
 
             {/* Packs */}
-            <div className="mb-6">
+            <div className="order-3 mb-6 lg:order-4">
               <div className="mb-2.5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8a8172]">
                 <span>📦</span> {t.bundleTitle}
               </div>
@@ -604,7 +592,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
               id="commander"
               onSubmit={submit}
               onFocus={startCheckout}
-              className="scroll-mt-24 space-y-2.5 rounded-[3px] border border-[#e7ddca] bg-white p-5 shadow-[0_2px_18px_rgba(26,22,19,0.06)]"
+              className="order-4 scroll-mt-24 space-y-2.5 rounded-[3px] border border-[#e7ddca] bg-white p-5 lg:order-5 shadow-[0_2px_18px_rgba(26,22,19,0.06)]"
             >
               <p className="mb-1 text-center text-[11px] font-bold uppercase tracking-[0.18em] text-[#8a8172]">
                 {t.formTitle}
@@ -681,19 +669,19 @@ export default function ProductLP({ product }: { product: LPProduct }) {
 
             {/* Livraison estimée */}
             {delivery && (
-              <p className="mt-4 flex items-center gap-2.5 text-[12px] md:text-[15px] text-[#4a4436]">
+              <p className="order-6 mt-4 flex items-center gap-2.5 text-[12px] md:text-[15px] text-[#4a4436]">
                 <span className="text-lg">🚚</span>
                 <span>
                   {t.deliveryBetween(delivery.a, delivery.b)} — <strong>{t.free}</strong>
                 </span>
               </p>
             )}
-            <p className="mt-1.5 flex items-center gap-2.5 text-[12px] md:text-[15px] font-semibold text-[#b8791a]">
+            <p className="order-6 mt-1.5 flex items-center gap-2.5 text-[12px] md:text-[15px] font-semibold text-[#b8791a]">
               <span className="text-lg">⚡</span> {t.lowStock(product.stock)}
             </p>
 
             {/* Avis en vitrine */}
-            <div className="mt-5 border-t border-[#e7ddca] pt-4">
+            <div className="order-6 mt-5 border-t border-[#e7ddca] pt-4">
               <div className="flex items-start gap-3">
                 <span className="font-display flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--gold)]/20 text-sm font-bold text-[var(--gold-dark)]">
                   {tr(product.reviews[revIdx].name).charAt(0)}
@@ -719,7 +707,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
             </div>
 
             {/* Accordéons */}
-            <div className="mt-5 divide-y divide-[#e7ddca] border-y border-[#e7ddca]">
+            <div className="order-6 mt-5 divide-y divide-[#e7ddca] border-y border-[#e7ddca]">
               <details className="group py-4 [&_summary::-webkit-details-marker]:hidden">
                 <summary className="flex cursor-pointer items-center gap-3 font-semibold text-[#1a1613]">
                   <span>♡</span>

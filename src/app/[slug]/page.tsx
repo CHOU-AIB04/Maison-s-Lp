@@ -83,8 +83,19 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     })),
   };
 
+  const heroSrc = product.variants[0].img; // = variantGallery(...)[0]
+
   return (
     <>
+      {/* Préchargement de l'image LCP — même srcSet que le composant */}
+      <link
+        rel="preload"
+        as="image"
+        href={img(heroSrc, 900)}
+        imageSrcSet={`${img(heroSrc, 450)} 450w, ${img(heroSrc, 700)} 700w, ${img(heroSrc, 1000)} 1000w`}
+        imageSizes="(min-width: 1024px) 560px, 100vw"
+        fetchPriority="high"
+      />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       <ProductLP product={product} />

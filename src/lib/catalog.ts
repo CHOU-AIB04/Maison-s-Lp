@@ -206,7 +206,7 @@ export const PRODUCTS: LPProduct[] = [
     rating: 4.9,
     reviewCount: 536,
     stock: 7,
-    hero: "v1782485773/prod5_white_C_c0yb8p.jpg",
+    hero: "v1782513698/image_1782513620489_7rhkph_vjjjbk.jpg",
     gallery: [
       "v1782485773/prod5_white_C_c0yb8p.jpg",
       "v1782146330/product_1_eufnps.png",
@@ -215,6 +215,19 @@ export const PRODUCTS: LPProduct[] = [
       "v1782485761/prod1_black_caree_dddkql.jpg",
     ],
     variants: [
+      {
+        key: "rouge",
+        label: { fr: "Rouge · Rubis", ar: "أحمر · ياقوتي" },
+        img: "v1782513698/image_1782513620489_7rhkph_vjjjbk.jpg",
+        desc: {
+          fr: "Cristaux rouge rubis sur monture argentée — le modèle des caftans et des soirées.",
+          ar: "كريستال أحمر ياقوتي على قاعدة فضية — موديل القفاطن والسهرات.",
+        },
+        gallery: [
+          "v1782513698/image_1782513620489_7rhkph_vjjjbk.jpg",
+          "v1782485761/prod1_black_caree_dddkql.jpg",
+        ],
+      },
       {
         key: "bicolore",
         label: { fr: "Bicolore · Améthyste", ar: "ثنائي اللون · أميتيست" },
@@ -267,19 +280,6 @@ export const PRODUCTS: LPProduct[] = [
           ar: "فضة وكريستال، لللي كتفضل الفضي على الذهبي.",
         },
         gallery: ["v1782485785/prod9_white_c_b55akf.jpg", "v1782485777/prod9_black_c_m47wyw.jpg"],
-      },
-      {
-        key: "rouge",
-        label: { fr: "Rouge · Rubis", ar: "أحمر · ياقوتي" },
-        img: "v1782513698/image_1782513620489_7rhkph_vjjjbk.jpg",
-        desc: {
-          fr: "Cristaux rouge rubis sur monture argentée — le modèle des caftans et des soirées.",
-          ar: "كريستال أحمر ياقوتي على قاعدة فضية — موديل القفاطن والسهرات.",
-        },
-        gallery: [
-          "v1782513698/image_1782513620489_7rhkph_vjjjbk.jpg",
-          "v1782485761/prod1_black_caree_dddkql.jpg",
-        ],
       },
     ],
     bundles: bundlesFor(139, 30, 50),
@@ -521,13 +521,13 @@ export const PRODUCTS: LPProduct[] = [
       "v1783970701/4f65dcf49a67ed61428e243c172e7b67_1_1783970597_2135_h0dl2l.png",
     ],
     variants: [
-      { key: "dore-amethyste", label: { fr: "Doré · Améthyste", ar: "ذهبي · أميتيست" }, img: "v1783970110/b03f100966953754e42c6a0362c26fc8_1_1783969577_7111_qeazz3.png" },
-      { key: "gold-black", label: { fr: "Doré · Noir", ar: "ذهبي · أسود" }, img: "v1783970112/768b1aec724deadb6a4cc64a180ccfc7_1_1783969735_4237_xn6aze.png" },
-      { key: "red-green", label: { fr: "Rouge · Vert", ar: "أحمر · أخضر" }, img: "v1783975633/0df7fbff10510a6f9166dafb74476594_1_1783975529_3558_1_qaht3w.png" },
-      { key: "white-silver", label: { fr: "Blanc · Argent", ar: "أبيض · فضي" }, img: "v1783970333/923c021705d00157b6d5caca46c40f77_1_1783969874_6864_slrd7d.png" },
-      { key: "pink-silver", label: { fr: "Rose · Argent", ar: "زهري · فضي" }, img: "v1783970532/1d4a9ad34ffcf503e5f00d7d382d5539_1783970466945_fjla1y.png" },
-      { key: "black-silver", label: { fr: "Noir · Argent", ar: "أسود · فضي" }, img: "v1783970701/4f65dcf49a67ed61428e243c172e7b67_1_1783970597_2135_h0dl2l.png" },
-      { key: "white-gold", label: { fr: "Blanc · Doré", ar: "أبيض · ذهبي" }, img: "v1783970789/7c8c9bed4a89e631817eb9b30b295f4c_1783970728862_ge8tku.png" },
+      { key: "dore-amethyste", label: { fr: "Doré · Améthyste", ar: "ذهبي · أميتيست" }, img: "v1783970110/b03f100966953754e42c6a0362c26fc8_1_1783969577_7111_qeazz3.png", gallery: ["v1783970110/b03f100966953754e42c6a0362c26fc8_1_1783969577_7111_qeazz3.png"] },
+      { key: "gold-black", label: { fr: "Doré · Noir", ar: "ذهبي · أسود" }, img: "v1783970112/768b1aec724deadb6a4cc64a180ccfc7_1_1783969735_4237_xn6aze.png", gallery: ["v1783970112/768b1aec724deadb6a4cc64a180ccfc7_1_1783969735_4237_xn6aze.png"] },
+      { key: "red-green", label: { fr: "Rouge · Vert", ar: "أحمر · أخضر" }, img: "v1783975633/0df7fbff10510a6f9166dafb74476594_1_1783975529_3558_1_qaht3w.png", gallery: ["v1783975633/0df7fbff10510a6f9166dafb74476594_1_1783975529_3558_1_qaht3w.png"] },
+      { key: "white-silver", label: { fr: "Blanc · Argent", ar: "أبيض · فضي" }, img: "v1783970333/923c021705d00157b6d5caca46c40f77_1_1783969874_6864_slrd7d.png", gallery: ["v1783970333/923c021705d00157b6d5caca46c40f77_1_1783969874_6864_slrd7d.png"] },
+      { key: "pink-silver", label: { fr: "Rose · Argent", ar: "زهري · فضي" }, img: "v1783970532/1d4a9ad34ffcf503e5f00d7d382d5539_1783970466945_fjla1y.png", gallery: ["v1783970532/1d4a9ad34ffcf503e5f00d7d382d5539_1783970466945_fjla1y.png"] },
+      { key: "black-silver", label: { fr: "Noir · Argent", ar: "أسود · فضي" }, img: "v1783970701/4f65dcf49a67ed61428e243c172e7b67_1_1783970597_2135_h0dl2l.png", gallery: ["v1783970701/4f65dcf49a67ed61428e243c172e7b67_1_1783970597_2135_h0dl2l.png"] },
+      { key: "white-gold", label: { fr: "Blanc · Doré", ar: "أبيض · ذهبي" }, img: "v1783970789/7c8c9bed4a89e631817eb9b30b295f4c_1783970728862_ge8tku.png", gallery: ["v1783970789/7c8c9bed4a89e631817eb9b30b295f4c_1783970728862_ge8tku.png"] },
     ],
     bundles: bundlesFor(99, 20, 40),
     usps: [

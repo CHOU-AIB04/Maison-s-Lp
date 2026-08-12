@@ -11,29 +11,31 @@ const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://lp-maison-dor.vercel.a
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   variable: "--font-cormorant",
-  weight: ["500", "600", "700"],
+  weight: ["600", "700"],
   display: "swap",
 });
 
 const jost = Jost({
   subsets: ["latin"],
   variable: "--font-jost",
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "700"],
   display: "swap",
 });
 
 // Fallbacks arabes (darija)
 const cairo = Cairo({
+  preload: false,
   subsets: ["arabic"],
   variable: "--font-cairo",
-  weight: ["600", "700", "800"],
+  weight: ["700"],
   display: "swap",
 });
 
 const tajawal = Tajawal({
+  preload: false,
   subsets: ["arabic"],
   variable: "--font-tajawal",
-  weight: ["400", "500", "700"],
+  weight: ["400", "700"],
   display: "swap",
 });
 
@@ -53,6 +55,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="fr" dir="ltr">
       <head>
+        {/* Les images viennent de Cloudinary : on ouvre la connexion au plus tôt */}
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+
         {/* Google Tag Manager */}
         <Script
           id="gtm-head"
