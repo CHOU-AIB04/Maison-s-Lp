@@ -29,9 +29,9 @@ const UTM_KEYS = [
 
 /* ── Meta Pixel ─────────────────────────────────────────── */
 type Fbq = (...args: unknown[]) => void;
-const track = (event: string, data?: Record<string, unknown>) => {
+const track = (event: string, data?: Record<string, unknown>, eventID?: string) => {
   if (typeof window === "undefined") return;
-  (window as unknown as { fbq?: Fbq }).fbq?.("track", event, data);
+  (window as unknown as { fbq?: Fbq }).fbq?.("track", event, data, eventID ? { eventID } : undefined);
 };
 
 function Stars({ n = 5, className = "" }: { n?: number; className?: string }) {
@@ -243,7 +243,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
         value: total,
         currency: "MAD",
         num_items: qty,
-      });
+      }, json.orderNum);
       gtmEvent("purchase", {
         transaction_id: json.orderNum || `MDO-${Date.now()}`,
         currency: "MAD",
