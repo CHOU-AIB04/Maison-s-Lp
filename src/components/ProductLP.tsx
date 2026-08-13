@@ -290,6 +290,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
           qty: 1,
           lang,
           source: `${product.slug}-upsell`,
+          addonToOrderNum: orderNum,
           utm,
           utmSource: utm.utm_source || "",
           utmContent: utm.utm_content || "",

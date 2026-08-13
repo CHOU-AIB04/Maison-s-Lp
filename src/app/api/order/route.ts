@@ -36,6 +36,7 @@ type OrderPayload = {
   utmSource?: string;
   utmContent?: string;
   utm?: Record<string, string>;
+  addonToOrderNum?: string;
 };
 
 const EMAIL_TO = (process.env.ORDER_EMAIL_TO || "chouaibalx@gmail.com,m.eladraouy@gmail.com")
@@ -155,10 +156,27 @@ async function sendOrderEmail(args: {
 /* ─────────────────────────────────────────────
    4. Vercel Blob — journal des commandes
    ───────────────────────────────────────────── */
-async function logToBlob(row: Record<string, unknown>) {
+async function logToBlob(row: Record<string, unknown>, addonToOrderNum?: string) {
   try {
+    const store = ordersStore();
+    // Upsell : on fusionne dans la commande parente (même orderNum) au lieu d'en créer une nouvelle.
+    if (addonToOrderNum) {
+      const parent = (await store.get(String(addonToOrderNum), { type: "json" })) as Record<string, unknown> | null;
+      if (parent) {
+        const pItems = Array.isArray(parent.items) ? (parent.items as unknown[]) : [];
+        const rItems = Array.isArray(row.items) ? (row.items as unknown[]) : [];
+        parent.items = [...pItems, ...rItems];
+        parent.total = (Number(parent.total) || 0) + (Number(row.total) || 0);
+        parent.subtotal = (Number(parent.subtotal) || 0) + (Number(row.subtotal) || 0);
+        parent.discount = (Number(parent.discount) || 0) + (Number(row.discount) || 0);
+        parent.qty = (Number(parent.qty) || 0) + (Number(row.qty) || 0);
+        await store.setJSON(String(addonToOrderNum), parent);
+        return;
+      }
+      // parent introuvable → on retombe sur un enregistrement normal
+    }
     const key = String(row.orderNum || `${Date.now()}-${Math.floor(Math.random() * 1e6)}`);
-    await ordersStore().setJSON(key, row);
+    await store.setJSON(key, row);
   } catch (e) {
     // non bloquant : la commande reste prise (Forcelog + email) même si le journal échoue
     console.error("Netlify Blobs (order) failed:", e);
@@ -239,6 +257,7 @@ export async function POST(req: NextRequest) {
     variant: body.variant || items[0]?.variant || "",
     color: body.variant || items[0]?.variant || "",
     image: items[0]?.image || "",
+    items,
     qty: body.qty ?? items.reduce((s, i) => s + i.quantity, 0),
     price: items[0]?.price ?? 0,
     subtotal,
@@ -293,7 +312,7 @@ export async function POST(req: NextRequest) {
       utmSource,
       utmContent,
     }),
-    logToBlob({ ...row, forcelog: forcelog.ok }),
+    logToBlob({ ...row, forcelog: forcelog.ok }, body.addonToOrderNum),
   ]);
 
   if (!forcelog.ok && !forcelog.skipped) {
