@@ -18,6 +18,9 @@ import { FORCELOG_CITIES } from "@/lib/cities";
 
 type Status = "idle" | "sending" | "done";
 
+/** Upsell post-commande désactivé (repasser à true pour le réactiver). */
+const UPSELL_ENABLED = false;
+
 /** UTM + IDs de campagne Meta captés dans l'URL de l'annonce. */
 const UTM_KEYS = [
   "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id",
@@ -339,7 +342,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
           <h1 className="font-display mb-3 text-3xl font-black">{t.doneTitle}</h1>
           <p className="mb-8 text-[#5b5346]">{t.doneMsg(orderNum)}</p>
 
-          {upsellProduct && upsellState !== "added" && upsellState !== "declined" && (
+          {UPSELL_ENABLED && upsellProduct && upsellState !== "added" && upsellState !== "declined" && (
             <div className="rounded-3xl border-2 border-[var(--gold)] bg-white p-5 text-start shadow-xl">
               <div className="mb-3 inline-block rounded-full gold-bg px-3 py-1 text-xs font-bold text-white">
                 {t.upsellBadge}
