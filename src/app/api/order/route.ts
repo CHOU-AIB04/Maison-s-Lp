@@ -1,63 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import crypto from "node:crypto";
 import { ordersStore } from "@/lib/store";
 import { FORCELOG_CITIES } from "@/lib/cities";
 import { buildOrderEmailHtml, type EmailItem } from "@/lib/order-email";
 import { pushNtfy } from "@/lib/notify";
+import { sendCapiEvent } from "@/lib/capi";
 
 export const runtime = "nodejs";
-
-const META_PIXEL_ID = process.env.META_PIXEL_ID || "36659330483710557";
-
-/** Conversions API (serveur) — Purchase dédupliqué avec le pixel via event_id = orderNum. */
-async function sendCapiPurchase(args: {
-  orderNum: string;
-  phone: string; // normalisé 06/07...
-  name: string;
-  value: number;
-  numItems: number;
-  ip?: string;
-  ua?: string;
-  fbp?: string;
-  fbc?: string;
-  sourceUrl?: string;
-}) {
-  const token = process.env.CAPI_TOKEN;
-  if (!token) return; // pas de token → CAPI désactivé (le pixel navigateur continue seul)
-  const sha = (v: string) => crypto.createHash("sha256").update(v.trim().toLowerCase()).digest("hex");
-  const phoneE164 = args.phone.replace(/\D/g, "").replace(/^0/, "212"); // 06.. -> 2126..
-  const first = args.name.trim().split(/\s+/)[0] || "";
-  const user_data: Record<string, unknown> = {
-    ph: [sha(phoneE164)],
-    ...(first ? { fn: [sha(first)] } : {}),
-    ...(args.ip ? { client_ip_address: args.ip } : {}),
-    ...(args.ua ? { client_user_agent: args.ua } : {}),
-    ...(args.fbp ? { fbp: args.fbp } : {}),
-    ...(args.fbc ? { fbc: args.fbc } : {}),
-  };
-  const payload = {
-    data: [
-      {
-        event_name: "Purchase",
-        event_time: Math.floor(Date.now() / 1000),
-        event_id: args.orderNum,
-        action_source: "website",
-        ...(args.sourceUrl ? { event_source_url: args.sourceUrl } : {}),
-        user_data,
-        custom_data: { value: args.value, currency: "MAD", num_items: args.numItems, content_type: "product" },
-      },
-    ],
-  };
-  try {
-    await fetch(`https://graph.facebook.com/v21.0/${META_PIXEL_ID}/events?access_token=${token}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-  } catch (e) {
-    console.error("CAPI Purchase failed:", e);
-  }
-}
 
 /* ─────────────────────────────────────────────
    Payload envoyé par la landing page
@@ -297,6 +245,11 @@ export async function POST(req: NextRequest) {
         )
       : {};
 
+  // Signaux d'attribution Meta (stockés pour le Purchase à la livraison, plus tard)
+  const fbclid = (utm as Record<string, string>).fbclid;
+  const fbp = req.cookies.get("_fbp")?.value;
+  const fbc = req.cookies.get("_fbc")?.value || (fbclid ? `fb.1.${Date.now()}.${fbclid}` : undefined);
+
   const row = {
     date: new Date().toISOString(),
     orderNum,
@@ -311,6 +264,8 @@ export async function POST(req: NextRequest) {
     color: body.variant || items[0]?.variant || "",
     image: items[0]?.image || "",
     items,
+    fbc: fbc || "",
+    fbp: fbp || "",
     qty: body.qty ?? items.reduce((s, i) => s + i.quantity, 0),
     price: items[0]?.price ?? 0,
     subtotal,
@@ -342,14 +297,12 @@ export async function POST(req: NextRequest) {
     req.headers.get("x-nf-client-connection-ip") ||
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     undefined;
-  const fbp = req.cookies.get("_fbp")?.value;
-  const fbclid = (utm as Record<string, string>).fbclid;
-  const fbc = req.cookies.get("_fbc")?.value || (fbclid ? `fb.1.${Date.now()}.${fbclid}` : undefined);
   const sourceUrl = req.headers.get("referer") || undefined;
 
   // ── Notifications & journal : non bloquants
+  // CAPI "Lead" au submit (commande passée) — le vrai "Purchase" part à la livraison.
   await Promise.allSettled([
-    sendCapiPurchase({
+    sendCapiEvent("Lead", {
       orderNum,
       phone: normalized,
       name,

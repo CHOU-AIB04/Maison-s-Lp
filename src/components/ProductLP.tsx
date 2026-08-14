@@ -236,7 +236,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
       if (!json.ok) throw new Error(json.error || "err");
 
       setOrderNum(json.orderNum || "");
-      track("Purchase", {
+      track("Lead", {
         content_name: product.name.fr,
         content_ids: [product.id],
         content_type: "product",
@@ -301,7 +301,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
       });
       const json = await res.json();
       if (!json.ok) throw new Error();
-      track("Purchase", {
+      track("Lead", {
         content_name: `${upsellProduct.name.fr} UPSELL`,
         content_ids: [upsellProduct.id],
         value: upsellPrice,
