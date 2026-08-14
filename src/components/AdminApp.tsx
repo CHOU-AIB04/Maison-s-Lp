@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { PRODUCTS } from "@/lib/catalog";
 
 type Status = "new" | "confirmed" | "shipped" | "delivered" | "cancelled";
 
@@ -46,7 +47,7 @@ export default function AdminApp({ apiKey, onLogout }: { apiKey: string; onLogou
   const k = apiKey;
   const [orders, setOrders] = useState<Order[] | null>(null);
   const [auth, setAuth] = useState<"loading" | "ok" | "denied">("loading");
-  const [tab, setTab] = useState<"commandes" | "dashboard">("commandes");
+  const [tab, setTab] = useState<"commandes" | "dashboard" | "simulation">("commandes");
   const [filter, setFilter] = useState<"all" | Status>("all");
   const [busy, setBusy] = useState("");
 
@@ -117,7 +118,7 @@ export default function AdminApp({ apiKey, onLogout }: { apiKey: string; onLogou
         </div>
       </div>
       <div className="mb-6 flex gap-2">
-        {([["commandes", "📦 Commandes"], ["dashboard", "📊 Dashboard"]] as const).map(([t, l]) => (
+        {([["commandes", "📦 Commandes"], ["dashboard", "📊 Dashboard"], ["simulation", "🧮 Simulation"]] as const).map(([t, l]) => (
           <button key={t} onClick={() => setTab(t)}
             className={`rounded-full px-5 py-2 text-sm font-bold transition ${tab === t ? "gold-bg text-white shadow" : "bg-white text-[#6b6353] border border-[#e7ddca]"}`}>
             {l}{t === "commandes" && counts.new > 0 && <span className="ms-2 rounded-full bg-blue-600 px-2 text-xs text-white">{counts.new}</span>}
@@ -129,8 +130,10 @@ export default function AdminApp({ apiKey, onLogout }: { apiKey: string; onLogou
         <div className="p-10 text-center text-[#8a8172]">Chargement…</div>
       ) : tab === "commandes" ? (
         <OrdersPanel orders={shown} counts={counts} filter={filter} setFilter={setFilter} setStatus={setStatus} deleteOrder={deleteOrder} busy={busy} />
-      ) : (
+      ) : tab === "dashboard" ? (
         <DashboardPanel orders={orders} />
+      ) : (
+        <SimulationPanel orders={orders} />
       )}
     </div>
   );
@@ -345,6 +348,148 @@ function Kpi({ label, value, sub, accent }: { label: string; value: string; sub:
       <div className="text-xs font-bold uppercase tracking-wide text-[#8a8172]">{label}</div>
       <div className="font-display text-2xl font-black md:text-3xl">{value}</div>
       <div className="mt-0.5 text-xs text-[#b3aa98]">{sub}</div>
+    </div>
+  );
+}
+
+/* ═══════════════ SIMULATION RENTABILITÉ ═══════════════ */
+const SIM_KEY = "mdor_sim";
+type SimState = {
+  cpa: number; // coût pub Meta par commande (form submit)
+  rate: number; // taux de livraison COD en %
+  ship: number; // frais de livraison payés par commande livrée
+  ret: number; // frais retour par commande non livrée
+  target: number; // objectif de profit
+  cogs: Record<string, number>; // prix d'achat par produit
+  price: Record<string, number>; // prix de vente (override) par produit
+};
+const SIM_DEFAULT: SimState = { cpa: 40, rate: 65, ship: 25, ret: 10, target: 5000, cogs: {}, price: {} };
+
+function SimNum({ label, value, onChange, suffix, hint }: { label: string; value: number; onChange: (n: number) => void; suffix?: string; hint?: string }) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-xs font-bold text-[#6b6353]">{label}</span>
+      <div className="flex items-center rounded-xl border border-[#e3d9c6] bg-white px-3">
+        <input type="number" value={Number.isFinite(value) ? value : 0} onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+          className="w-full bg-transparent py-2.5 text-sm font-bold outline-none" />
+        {suffix && <span className="ms-1 text-xs text-[#8a8172]">{suffix}</span>}
+      </div>
+      {hint && <span className="mt-0.5 block text-[10px] text-[#b3aa98]">{hint}</span>}
+    </label>
+  );
+}
+
+function SimulationPanel({ orders }: { orders: Order[] }) {
+  const [s, setS] = useState<SimState>(SIM_DEFAULT);
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(SIM_KEY);
+      if (raw) setS({ ...SIM_DEFAULT, ...JSON.parse(raw) });
+    } catch {
+      /* ignore */
+    }
+  }, []);
+  const save = (next: SimState) => {
+    setS(next);
+    try { localStorage.setItem(SIM_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+  };
+  const upd = (patch: Partial<SimState>) => save({ ...s, ...patch });
+
+  // CPA réel estimé depuis les commandes livrées (indicatif)
+  const delivered = orders.filter((o) => o.status === "delivered").length;
+  const money = (n: number) => `${Math.round(n).toLocaleString("fr-FR")} DH`;
+  const r = Math.min(1, Math.max(0, s.rate / 100));
+
+  const rows = PRODUCTS.map((p) => {
+    const price = s.price[p.slug] ?? p.price;
+    const cogs = s.cogs[p.slug] ?? 0;
+    const margeLivree = price - cogs - s.ship; // avant pub
+    const profitCmd = r * margeLivree - s.cpa - (1 - r) * s.ret; // par commande passée (form)
+    const profitVente = r > 0 ? profitCmd / r : profitCmd; // par commande livrée
+    const beCPA = r * margeLivree - (1 - r) * s.ret; // CPA max (breakeven)
+    const ventes = profitVente > 0 ? Math.ceil(s.target / profitVente) : null;
+    const cmds = ventes != null && r > 0 ? Math.ceil(ventes / r) : null;
+    const budget = cmds != null ? cmds * s.cpa : null;
+    return { p, price, cogs, margeLivree, profitCmd, profitVente, beCPA, ventes, cmds, budget };
+  });
+
+  return (
+    <div className="space-y-6">
+      {/* Paramètres */}
+      <div className="rounded-2xl border border-[#f0e8d8] bg-white p-5">
+        <h2 className="mb-1 font-display font-black">Paramètres (COD)</h2>
+        <p className="mb-4 text-sm text-[#8a8172]">Enregistrés sur ton appareil. {delivered > 0 ? `(${delivered} livrées à ce jour)` : ""}</p>
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <SimNum label="Coût pub Meta / commande" value={s.cpa} onChange={(n) => upd({ cpa: n })} suffix="DH" hint="CPA au form submit" />
+          <SimNum label="Taux de livraison" value={s.rate} onChange={(n) => upd({ rate: n })} suffix="%" hint="commandes livrées / passées" />
+          <SimNum label="Frais livraison" value={s.ship} onChange={(n) => upd({ ship: n })} suffix="DH" hint="payé par commande livrée" />
+          <SimNum label="Frais retour" value={s.ret} onChange={(n) => upd({ ret: n })} suffix="DH" hint="colis non livré" />
+        </div>
+      </div>
+
+      {/* Table produits */}
+      <div className="overflow-x-auto rounded-2xl border border-[#f0e8d8] bg-white">
+        <table className="w-full text-sm">
+          <thead className="bg-[var(--cream)] text-left text-[#6b6353]">
+            <tr>
+              <th className="p-3">Produit</th>
+              <th className="p-3">Prix vente</th>
+              <th className="p-3">Prix achat</th>
+              <th className="p-3">Marge/livrée</th>
+              <th className="p-3">CPA max</th>
+              <th className="p-3">Profit/commande</th>
+              <th className="p-3">Profit/vente</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(({ p, price, cogs, margeLivree, profitCmd, profitVente, beCPA }) => (
+              <tr key={p.slug} className="border-t border-[#f3ecdd]">
+                <td className="p-3 font-bold">{p.name.fr}</td>
+                <td className="p-3">
+                  <input type="number" value={price} onChange={(e) => upd({ price: { ...s.price, [p.slug]: parseFloat(e.target.value) || 0 } })}
+                    className="w-20 rounded-lg border border-[#e3d9c6] px-2 py-1 font-bold" />
+                </td>
+                <td className="p-3">
+                  <input type="number" placeholder="0" value={s.cogs[p.slug] ?? ""} onChange={(e) => upd({ cogs: { ...s.cogs, [p.slug]: parseFloat(e.target.value) || 0 } })}
+                    className="w-20 rounded-lg border border-[#e3d9c6] px-2 py-1 font-bold" />
+                </td>
+                <td className="p-3">{money(margeLivree)}</td>
+                <td className="p-3 font-bold" style={{ color: beCPA > 0 ? "#15803d" : "#b91c1c" }}>{money(beCPA)}</td>
+                <td className="p-3 font-black" style={{ color: profitCmd >= 0 ? "#15803d" : "#b91c1c" }}>{money(profitCmd)}</td>
+                <td className="p-3 font-black" style={{ color: profitVente >= 0 ? "#15803d" : "#b91c1c" }}>{cogs ? money(profitVente) : "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="text-xs text-[#8a8172]">
+        <b>Marge/livrée</b> = prix − achat − livraison · <b>CPA max</b> = ce que tu peux payer Meta/commande sans perdre · <b>Profit/commande</b> = net par form rempli (pub incluse, non-livrées déduites) · <b>Profit/vente</b> = net par commande livrée.
+      </p>
+
+      {/* Objectif */}
+      <div className="rounded-2xl border-2 border-[var(--gold)] bg-white p-5">
+        <div className="mb-3 flex flex-wrap items-end gap-3">
+          <div className="w-40">
+            <SimNum label="🎯 Objectif de profit" value={s.target} onChange={(n) => upd({ target: n })} suffix="DH" />
+          </div>
+          <span className="pb-2 text-sm text-[#8a8172]">→ combien vendre par produit :</span>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-3">
+          {rows.map(({ p, profitVente, ventes, cmds, budget }) => (
+            <div key={p.slug} className="rounded-xl bg-[var(--cream)] p-3">
+              <div className="font-bold">{p.name.fr}</div>
+              {profitVente > 0 && ventes != null ? (
+                <div className="mt-1 text-sm text-[#4a4436]">
+                  <div><b className="gold-text">{ventes}</b> ventes livrées</div>
+                  <div className="text-xs text-[#8a8172]">≈ {cmds} commandes · budget pub ≈ {money(budget || 0)}</div>
+                </div>
+              ) : (
+                <div className="mt-1 text-sm font-bold text-red-600">Non rentable (remplis prix d&apos;achat / baisse CPA)</div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
