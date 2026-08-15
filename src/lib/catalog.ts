@@ -56,7 +56,7 @@ export type LPProduct = {
    ═══════════════════════════════════════════════════════════ */
 
 const SPECS_ACIER: Spec[] = [
-  { label: { fr: "Matière", ar: "المادة" }, value: { fr: "Acier inoxydable plaqué or 18K", ar: "فولاذ مقاوم للصدأ مطلي بذهب 18 قيراط" } },
+  { label: { fr: "Matière", ar: "المادة" }, value: { fr: "Acier inoxydable (doré ou argenté)", ar: "فولاذ مقاوم للصدأ (ذهبي أو فضي)" } },
   { label: { fr: "Pierres", ar: "الأحجار" }, value: { fr: "Cristaux taille marquise sertis à la main", ar: "كريستال مقصوص يدويًا" } },
   { label: { fr: "Contenu", ar: "المحتوى" }, value: { fr: "1 collier + 1 bracelet assorti", ar: "عقد + سوار متناسق" } },
   { label: { fr: "Peau sensible", ar: "البشرة الحساسة" }, value: { fr: "Hypoallergénique · sans nickel", ar: "لا يسبب الحساسية · بدون نيكل" } },
@@ -69,8 +69,8 @@ const BENEFITS_BASE: Benefit[] = [
     icon: "✨",
     title: { fr: "Ne noircit pas, ne verdit pas", ar: "لا يسوّد ولا يخضّر" },
     desc: {
-      fr: "Le plaquage or 18K sur acier inoxydable garde son éclat même après des mois de port quotidien — contrairement aux bijoux fantaisie du marché.",
-      ar: "الطلاء الذهبي 18 قيراط على الفولاذ يحافظ على لمعانه حتى بعد شهور من الاستعمال اليومي — عكس المجوهرات العادية.",
+      fr: "L'acier inoxydable garde son éclat même après des mois de port quotidien : il ne rouille pas et ne ternit pas, contrairement aux bijoux fantaisie du marché.",
+      ar: "الفولاذ المقاوم للصدأ يحافظ على لمعانه حتى بعد أشهر من الاستعمال اليومي: لا يصدأ ولا يتغيّر لونه، عكس المجوهرات العادية.",
     },
   },
   {
@@ -198,8 +198,8 @@ export const PRODUCTS: LPProduct[] = [
       ar: "عقد + سوار متناسقين — 4 موديلات، ثمن واحد",
     },
     subheadline: {
-      fr: "Parures florales serties de cristaux sur acier inoxydable plaqué or 18K ou argent rhodié. Choisissez votre modèle, on vous le livre en coffret — vous payez à la réception.",
-      ar: "أطقم زهرية مرصّعة بالكريستال على فولاذ مطلي بذهب 18 قيراط ولا فضة. ختاري الموديل ديالك، وكيوصلك فعلبة — وكتخلصي عند الاستلام.",
+      fr: "Parures florales serties de cristaux sur acier inoxydable doré ou argenté. Choisissez votre modèle, on vous le livre en coffret — vous payez à la réception.",
+      ar: "أطقم زهرية مرصّعة بالكريستال على فولاذ مقاوم للصدأ، ذهبي أو فضي. اختاري الموديل ديالك، وكيوصلك فعلبة — وكتخلصي عند الاستلام.",
     },
     price: 139,
     compareAt: 209,
@@ -262,8 +262,8 @@ export const PRODUCTS: LPProduct[] = [
         label: { fr: "Argentée · Cristal", ar: "فضي · كريستال" },
         img: "v1782485785/prod9_white_c_b55akf.jpg",
         desc: {
-          fr: "Argent rhodié et cristaux taille marquise, pour celles qui préfèrent l'argent au doré.",
-          ar: "فضة وكريستال، لللي كتفضل الفضي على الذهبي.",
+          fr: "Finition argentée et cristaux taille marquise, pour celles qui préfèrent l'argent au doré.",
+          ar: "لون فضي وكريستال، لللي كتفضل الفضي على الذهبي.",
         },
         gallery: ["v1782485785/prod9_white_c_b55akf.jpg", "v1782485777/prod9_black_c_m47wyw.jpg"],
       },
@@ -280,8 +280,8 @@ export const PRODUCTS: LPProduct[] = [
     story: {
       title: { fr: "Quel modèle Tulip choisir ?", ar: "شنو الموديل Tulip اللي تختاري؟" },
       body: {
-        fr: "Les quatre modèles partagent exactement la même fabrication : base en acier inoxydable, plaquage or 18K ou rhodiage argent, cristaux sertis un par un. La différence est purement esthétique. Bicolore est le plus habillé, avec ses cristaux améthyste en cascade — c'est celui qu'on choisit pour un mariage ou un cadeau. Dorée est le plus polyvalent : cristal transparent, aucune couleur à assortir, c'est notre plus grosse vente. Argentée s'adresse à celles qui portent déjà de l'argent ou une montre en acier. Rouge est le plus affirmé, pensé pour le caftan et les soirées. Si vous hésitez, prenez Dorée : c'est celui qui se porte le plus souvent.",
-        ar: "الأربعة موديلات عندهم نفس الصناعة: قاعدة من الفولاذ المقاوم للصدأ، طلاء ذهبي 18 قيراط ولا فضي، وكريستال مرصّع حبة بحبة. الفرق غير جمالي. ثنائي اللون هو الأكثر أناقة بالأميتيست — وهو اللي كيتختار للعرس ولا للهدية. الذهبي هو الأكثر استعمالًا: كريستال شفاف، بلا لون خاصك تناسبيه، وهو الأكثر مبيعًا عندنا. الفضي لللي كتلبس الفضة ولا ماكينة ديال الفولاذ. والأحمر هو الأقوى، مصمم للقفطان والسهرات. إلى حتارتي، خدي الذهبي.",
+        fr: "Les quatre modèles partagent exactement la même fabrication : base en acier inoxydable, finition dorée ou argentée, cristaux sertis un par un. La différence est purement esthétique. Bicolore est le plus habillé, avec ses cristaux améthyste en cascade — c'est celui qu'on choisit pour un mariage ou un cadeau. Dorée est le plus polyvalent : cristal transparent, aucune couleur à assortir, c'est notre plus grosse vente. Argentée s'adresse à celles qui portent déjà de l'argent ou une montre en acier. Rouge est le plus affirmé, pensé pour le caftan et les soirées. Si vous hésitez, prenez Dorée : c'est celui qui se porte le plus souvent.",
+        ar: "الأربعة موديلات عندهم نفس الصناعة: قاعدة من الفولاذ المقاوم للصدأ، بلمسة ذهبية أو فضية، وكريستال مرصّع حبة بحبة. الفرق غير جمالي. ثنائي اللون هو الأكثر أناقة بالأميتيست — وهو اللي كيتختار للعرس ولا للهدية. الذهبي هو الأكثر استعمالًا: كريستال شفاف، بلا لون خاصك تناسبيه، وهو الأكثر مبيعًا عندنا. الفضي لللي كتلبس الفضة ولا ماكينة ديال الفولاذ. والأحمر هو الأقوى، مصمم للقفطان والسهرات. إلى حتارتي، خدي الذهبي.",
       },
     },
     specs: SPECS_ACIER,
@@ -349,7 +349,7 @@ export const PRODUCTS: LPProduct[] = [
         label: { fr: "Améthyste", ar: "أميتيست" },
         img: "v1782485765/prod3_white_C_agk2ln.jpg",
         desc: {
-          fr: "Cristaux violets sur argent rhodié — le violet met particulièrement en valeur les peaux mates.",
+          fr: "Cristaux violets sur acier argenté — le violet met particulièrement en valeur les peaux mates.",
           ar: "كريستال بنفسجي على الفضة — البنفسجي كيبرز البشرة القمحية بزاف.",
         },
         gallery: [
@@ -389,7 +389,7 @@ export const PRODUCTS: LPProduct[] = [
         label: { fr: "Rose & Argent", ar: "زهري · فضي" },
         img: "v1782498863/image_1782498175677_w6b338_kjhxey.jpg",
         desc: {
-          fr: "Rose poudré sur argent rhodié : la version la plus douce, très demandée en cadeau.",
+          fr: "Rose poudré sur acier argenté : la version la plus douce, très demandée en cadeau.",
           ar: "زهري ناعم على الفضة: النسخة الأكثر هدوءًا، ومطلوبة بزاف كهدية.",
         },
         gallery: [
@@ -425,7 +425,7 @@ export const PRODUCTS: LPProduct[] = [
     usps: [
       { fr: "6 coloris au même prix", ar: "6 ألوان بنفس الثمن" },
       { fr: "Collier + bracelet en coffret", ar: "عقد + سوار فعلبة" },
-      { fr: "Argent rhodié, ne noircit pas", ar: "فضة ما كتسودش" },
+      { fr: "Acier argenté, ne noircit pas", ar: "فولاذ فضي ما كيسودش" },
       { fr: "Livraison gratuite · paiement à la réception", ar: "توصيل مجاني · الخلاص عند الاستلام" },
     ],
     benefits: [
@@ -448,12 +448,12 @@ export const PRODUCTS: LPProduct[] = [
     story: {
       title: { fr: "Quel coloris Swan choisir ?", ar: "شنو اللون Swan اللي تختاري؟" },
       body: {
-        fr: "Les six coloris partagent la même fabrication : argent rhodié ou monture dorée, pendentif cygne sculpté en volume, bracelet assorti, coffret inclus. Seule la teinte des cristaux change, et le prix reste identique. Le Blanc est le plus offert — sur dix commandes, sept partent en cadeau, parce que le cristal transparent ne dépend ni du teint, ni de la garde-robe, ni de l'âge. L'Améthyste et l'Argent & Violet sont les choix « pour soi » : le violet ressort sur les peaux mates. Le Rose et le Rose & Argent sont les plus doux, très demandés pour un anniversaire. Le Noir & Doré offre le contraste le plus marqué de la gamme. Si vous hésitez, prenez le Blanc : c'est celui qui se porte le plus souvent.",
+        fr: "Les six coloris partagent la même fabrication : acier argenté ou monture dorée, pendentif cygne sculpté en volume, bracelet assorti, coffret inclus. Seule la teinte des cristaux change, et le prix reste identique. Le Blanc est le plus offert — sur dix commandes, sept partent en cadeau, parce que le cristal transparent ne dépend ni du teint, ni de la garde-robe, ni de l'âge. L'Améthyste et l'Argent & Violet sont les choix « pour soi » : le violet ressort sur les peaux mates. Le Rose et le Rose & Argent sont les plus doux, très demandés pour un anniversaire. Le Noir & Doré offre le contraste le plus marqué de la gamme. Si vous hésitez, prenez le Blanc : c'est celui qui se porte le plus souvent.",
         ar: "الستة ألوان عندهم نفس الصناعة: فضة ولا قاعدة ذهبية، دلاية بجعة منحوتة، سوار متناسق، والعلبة داخلة. غير لون الكريستال هو اللي كيتبدل، والثمن كيبقى نفسو. الأبيض هو الأكثر إهداءً — من كل 10 طلبيات، 7 كيمشيو هدية، حيت الكريستال الشفاف ما كيعتمدش على لون البشرة ولا على الملابس ولا على العمر. الأميتيست والفضي · بنفسجي هوما الاختيار «ليك»: البنفسجي كيبان على البشرة القمحية. الزهري والزهري · فضي هوما الأنعم، ومطلوبين بزاف لعيد الميلاد. الأسود · ذهبي عندو أقوى تباين فالمجموعة. إلى حتارتي، خدي الأبيض.",
       },
     },
     specs: [
-      { label: { fr: "Matière", ar: "المادة" }, value: { fr: "Acier inoxydable rhodié argent", ar: "فولاذ مقاوم للصدأ مطلي بالفضة" } },
+      { label: { fr: "Matière", ar: "المادة" }, value: { fr: "Acier inoxydable argenté", ar: "فولاذ مقاوم للصدأ بلون فضي" } },
       { label: { fr: "Motif", ar: "التصميم" }, value: { fr: "Pendentif cygne sculpté en volume", ar: "دلاية بجعة منحوتة" } },
       ...SPECS_ACIER.slice(2),
     ],

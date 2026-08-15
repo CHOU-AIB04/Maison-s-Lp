@@ -58,7 +58,7 @@ export const UI = {
     compareUs: "Maison d'Or",
     compareThem: "Bijou fantaisie classique",
     compareRows: [
-      ["Tient dans le temps", "Acier inox + plaqué or 18K", "Laiton doré qui s'oxyde"],
+      ["Tient dans le temps", "Acier inoxydable de qualité", "Laiton doré qui s'oxyde"],
       ["Eau & parfum", "Aucun risque", "Ternit en quelques semaines"],
       ["Peaux sensibles", "Sans nickel, hypoallergénique", "Rougeurs fréquentes"],
       ["Sertissage", "Pierre par pierre", "Cristaux collés"],
@@ -171,7 +171,7 @@ export const UI = {
     compareUs: "Maison d'Or",
     compareThem: "بيجو عادي",
     compareRows: [
-      ["الصمود مع الوقت", "فولاذ + ذهب 18 قيراط", "نحاس كيتأكسد"],
+      ["الصمود مع الوقت", "فولاذ مقاوم للصدأ", "نحاس كيتأكسد"],
       ["الماء والعطر", "بلا خطر", "كيسود ف شي أسابيع"],
       ["البشرة الحساسة", "بدون نيكل", "كيسبب الاحمرار"],
       ["الترصيع", "حجرة بحجرة", "كريستال ملصوق"],

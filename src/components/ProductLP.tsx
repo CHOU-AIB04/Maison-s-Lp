@@ -967,7 +967,10 @@ function TopBar({
       </div>
       <header className="sticky top-0 z-40 border-b border-[#e7ddca] bg-[var(--cream)]/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <span className="font-display text-xl font-extrabold gold-text">Maison d&apos;Or</span>
+          <span className="flex items-center gap-2.5">
+            <img src="/logo.jpg" alt="Maison d'Or" width={36} height={36} className="h-9 w-9 rounded-full object-cover ring-1 ring-[var(--gold)]/40" />
+            <span className="font-display text-xl font-extrabold gold-text">Maison d&apos;Or</span>
+          </span>
           <button
             onClick={() => setLang(lang === "fr" ? "ar" : "fr")}
             className="rounded-full border border-[var(--gold)] px-4 py-1.5 text-sm font-bold text-[var(--gold-dark)] transition hover:bg-[var(--gold)] hover:text-white"

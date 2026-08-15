@@ -75,7 +75,7 @@ const DICT = {
     qtyDiscount: (pct: number) => `🎉 -${pct}% sur chaque pièce dès la 2ᵉ !`,
     whyTitle: "Pourquoi cet ensemble ?",
     why: [
-      ["✨", "Plaqué or résistant", "Reste comme neuf, ne ternit pas"],
+      ["✨", "Acier inoxydable résistant", "Reste comme neuf, ne ternit pas"],
       ["💎", "Design exclusif", "Un modèle qui vous distingue"],
       ["🎁", "Cadeau idéal", "Pack complet collier + bracelet en coffret"],
       ["🚚", "Livraison gratuite", "Partout au Maroc, paiement à la réception"],

@@ -4,7 +4,7 @@ import { PRODUCTS, img } from "@/lib/catalog";
 export const metadata = {
   title: "Maison d'Or — Parures & Bracelets, livraison gratuite au Maroc",
   description:
-    "Parures Tulip et Swan, bracelets sertis de cristaux. Plaqué or 18K, hypoallergénique. Livraison gratuite partout au Maroc, paiement à la livraison.",
+    "Parures Tulip et Swan, bracelets sertis de cristaux. Acier inoxydable (doré ou argenté), hypoallergénique. Livraison gratuite partout au Maroc, paiement à la livraison.",
 };
 
 export default function Home() {

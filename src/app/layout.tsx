@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Cairo, Tajawal, Cormorant_Garamond, Jost } from "next/font/google";
 import "./globals.css";
@@ -46,9 +46,15 @@ export const metadata: Metadata = {
     template: "%s",
   },
   description:
-    "Parures Tulip et Swan en plaqué or 18K et argent rhodié. Livraison gratuite partout au Maroc, paiement à la livraison.",
+    "Parures Tulip et Swan en acier inoxydable de qualité (doré ou argenté). Livraison gratuite partout au Maroc, paiement à la livraison.",
   robots: { index: true, follow: true },
-  icons: { icon: "/favicon.ico" },
+  icons: { icon: "/logo.jpg", apple: "/logo.jpg" },
+};
+
+// Force l'affichage clair (évite le rendu cassé en dark mode / navigateurs in-app IG/FB)
+export const viewport: Viewport = {
+  colorScheme: "light",
+  themeColor: "#faf6ef",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
