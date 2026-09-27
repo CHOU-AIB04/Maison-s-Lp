@@ -3,6 +3,7 @@ import { ordersStore } from "@/lib/store";
 import { FORCELOG_CITIES } from "@/lib/cities";
 import { buildOrderEmailHtml, type EmailItem } from "@/lib/order-email";
 import { pushNtfy } from "@/lib/notify";
+import { sendCapiEvent } from "@/lib/capi";
 import { PRODUCTS, isVariantInStock } from "@/lib/catalog";
 
 export const runtime = "nodejs";
@@ -36,6 +37,8 @@ type OrderPayload = {
   source?: string;
   utmSource?: string;
   utmContent?: string;
+  utm?: Record<string, string>;
+  addonToOrderNum?: string;
 };
 
 const EMAIL_TO = (process.env.ORDER_EMAIL_TO || "chouaibalx@gmail.com,m.eladraouy@gmail.com")
@@ -155,10 +158,27 @@ async function sendOrderEmail(args: {
 /* ─────────────────────────────────────────────
    4. Vercel Blob — journal des commandes
    ───────────────────────────────────────────── */
-async function logToBlob(row: Record<string, unknown>) {
+async function logToBlob(row: Record<string, unknown>, addonToOrderNum?: string) {
   try {
+    const store = ordersStore();
+    // Upsell : on fusionne dans la commande parente (même orderNum) au lieu d'en créer une nouvelle.
+    if (addonToOrderNum) {
+      const parent = (await store.get(String(addonToOrderNum), { type: "json" })) as Record<string, unknown> | null;
+      if (parent) {
+        const pItems = Array.isArray(parent.items) ? (parent.items as unknown[]) : [];
+        const rItems = Array.isArray(row.items) ? (row.items as unknown[]) : [];
+        parent.items = [...pItems, ...rItems];
+        parent.total = (Number(parent.total) || 0) + (Number(row.total) || 0);
+        parent.subtotal = (Number(parent.subtotal) || 0) + (Number(row.subtotal) || 0);
+        parent.discount = (Number(parent.discount) || 0) + (Number(row.discount) || 0);
+        parent.qty = (Number(parent.qty) || 0) + (Number(row.qty) || 0);
+        await store.setJSON(String(addonToOrderNum), parent);
+        return;
+      }
+      // parent introuvable → on retombe sur un enregistrement normal
+    }
     const key = String(row.orderNum || `${Date.now()}-${Math.floor(Math.random() * 1e6)}`);
-    await ordersStore().setJSON(key, row);
+    await store.setJSON(key, row);
   } catch (e) {
     // non bloquant : la commande reste prise (Forcelog + email) même si le journal échoue
     console.error("Netlify Blobs (order) failed:", e);
@@ -224,6 +244,25 @@ export async function POST(req: NextRequest) {
   const source = body.source || body.model || "LP";
   const utmSource = (body.utmSource || "").slice(0, 60);
   const utmContent = (body.utmContent || "").slice(0, 60);
+  const utm =
+    body.utm && typeof body.utm === "object"
+      ? Object.fromEntries(
+          Object.entries(body.utm)
+            .slice(0, 15)
+            .map(([kk, vv]) => [String(kk).slice(0, 30), String(vv).slice(0, 200)])
+        )
+      : {};
+
+  // Signaux d'attribution Meta (CAPI Purchase au submit + Delivered à la livraison)
+  const fbclid = (utm as Record<string, string>).fbclid;
+  const fbp = req.cookies.get("_fbp")?.value;
+  const fbc = req.cookies.get("_fbc")?.value || (fbclid ? `fb.1.${Date.now()}.${fbclid}` : undefined);
+  const ua = req.headers.get("user-agent") || undefined;
+  const ip =
+    req.headers.get("x-nf-client-connection-ip") ||
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    undefined;
+  const sourceUrl = req.headers.get("referer") || undefined;
 
   const row = {
     date: new Date().toISOString(),
@@ -237,6 +276,12 @@ export async function POST(req: NextRequest) {
     model: body.model || "",
     variant: body.variant || items[0]?.variant || "",
     color: body.variant || items[0]?.variant || "",
+    image: items[0]?.image || "",
+    items,
+    fbc: fbc || "",
+    fbp: fbp || "",
+    ip: ip || "",
+    ua: ua || "",
     qty: body.qty ?? items.reduce((s, i) => s + i.quantity, 0),
     price: items[0]?.price ?? 0,
     subtotal,
@@ -248,6 +293,7 @@ export async function POST(req: NextRequest) {
     source,
     utmSource,
     utmContent,
+    utm,
   };
 
   // ── Forcelog : bloquant (si ça échoue, on n'annonce pas la commande comme prise)
@@ -262,7 +308,21 @@ export async function POST(req: NextRequest) {
   });
 
   // ── Notifications & journal : non bloquants
+  // CAPI "Purchase" au submit (commande passée, dédup pixel via event_id = orderNum).
+  // La livraison part en "Delivered" depuis l'admin (api/orders).
   await Promise.allSettled([
+    sendCapiEvent("Purchase", {
+      orderNum,
+      phone: normalized,
+      name,
+      value: total,
+      numItems: Number(row.qty) || 1,
+      ip,
+      ua,
+      fbp,
+      fbc,
+      sourceUrl,
+    }),
     pushNtfy({
       orderNum,
       name,
@@ -290,7 +350,7 @@ export async function POST(req: NextRequest) {
       utmSource,
       utmContent,
     }),
-    logToBlob({ ...row, forcelog: forcelog.ok }),
+    logToBlob({ ...row, forcelog: forcelog.ok }, body.addonToOrderNum),
   ]);
 
   if (!forcelog.ok && !forcelog.skipped) {

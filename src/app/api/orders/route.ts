@@ -75,23 +75,25 @@ export async function PATCH(req: NextRequest) {
     map[id] = status as Status;
     await statusStore().setJSON(STATUS_KEY, map);
 
-    // ── Livrée = la VRAIE vente (COD payé) → CAPI Purchase (une seule fois)
+    // ── Livrée = la VRAIE vente (COD payé) → CAPI Delivered (une seule fois)
     if (status === "delivered" && prev !== "delivered") {
       try {
         const o = (await ordersStore().get(String(id), { type: "json" })) as Record<string, unknown> | null;
         if (o) {
-          await sendCapiEvent("Purchase", {
-            orderNum: `${id}-purchase`,
+          await sendCapiEvent("Delivered", {
+            orderNum: `${id}-delivered`,
             phone: String(o.phone || ""),
             name: String(o.name || ""),
             value: Number(o.total) || 0,
             numItems: Number(o.qty) || 1,
             fbc: o.fbc ? String(o.fbc) : undefined,
             fbp: o.fbp ? String(o.fbp) : undefined,
+            ip: o.ip ? String(o.ip) : undefined,
+            ua: o.ua ? String(o.ua) : undefined,
           });
         }
       } catch (e) {
-        console.error("CAPI Purchase (delivered) failed:", e);
+        console.error("CAPI Delivered failed:", e);
       }
     }
     return NextResponse.json({ ok: true, id, status });

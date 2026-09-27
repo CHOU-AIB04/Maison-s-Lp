@@ -2,8 +2,10 @@ import crypto from "node:crypto";
 
 /**
  * Conversions API Meta (serveur).
- * - "Lead"     : au form submit (commande passée)   -> dédup avec le pixel via event_id = orderNum
- * - "Purchase" : quand la commande passe en "Livrée" -> la vraie vente payée (COD)
+ * - "Purchase"  : au form submit (commande passée)   -> dédup avec le pixel via event_id = orderNum
+ *                 = l'événement optimisé par les campagnes Ventes (volume suffisant pour l'apprentissage)
+ * - "Delivered" : quand la commande passe en "Livrée" -> la vraie vente payée (COD), event custom
+ *                 pour mesurer le taux de livraison / créer une conversion perso plus tard
  */
 const PIXEL = process.env.META_PIXEL_ID || "36659330483710557";
 const sha = (v: string) => crypto.createHash("sha256").update(v.trim().toLowerCase()).digest("hex");
@@ -21,7 +23,7 @@ export type CapiArgs = {
   sourceUrl?: string;
 };
 
-export async function sendCapiEvent(eventName: "Lead" | "Purchase", a: CapiArgs) {
+export async function sendCapiEvent(eventName: "Purchase" | "Delivered", a: CapiArgs) {
   const token = process.env.CAPI_TOKEN;
   if (!token) return; // CAPI désactivé tant que le token n'est pas configuré
   const phoneE164 = (a.phone || "").replace(/\D/g, "").replace(/^0/, "212"); // 06.. -> 2126..
