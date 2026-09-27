@@ -3,8 +3,8 @@ import { ordersStore } from "@/lib/store";
 import { FORCELOG_CITIES } from "@/lib/cities";
 import { buildOrderEmailHtml, type EmailItem } from "@/lib/order-email";
 import { pushNtfy } from "@/lib/notify";
-import { PRODUCTS, isVariantInStock } from "@/lib/catalog";
 import { sendCapiEvent } from "@/lib/capi";
+import { PRODUCTS, isVariantInStock } from "@/lib/catalog";
 
 export const runtime = "nodejs";
 
@@ -253,10 +253,16 @@ export async function POST(req: NextRequest) {
         )
       : {};
 
-  // Signaux d'attribution Meta (stockés pour le Purchase à la livraison, plus tard)
+  // Signaux d'attribution Meta (CAPI Purchase au submit + Delivered à la livraison)
   const fbclid = (utm as Record<string, string>).fbclid;
   const fbp = req.cookies.get("_fbp")?.value;
   const fbc = req.cookies.get("_fbc")?.value || (fbclid ? `fb.1.${Date.now()}.${fbclid}` : undefined);
+  const ua = req.headers.get("user-agent") || undefined;
+  const ip =
+    req.headers.get("x-nf-client-connection-ip") ||
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    undefined;
+  const sourceUrl = req.headers.get("referer") || undefined;
 
   const row = {
     date: new Date().toISOString(),
@@ -274,6 +280,8 @@ export async function POST(req: NextRequest) {
     items,
     fbc: fbc || "",
     fbp: fbp || "",
+    ip: ip || "",
+    ua: ua || "",
     qty: body.qty ?? items.reduce((s, i) => s + i.quantity, 0),
     price: items[0]?.price ?? 0,
     subtotal,
@@ -299,18 +307,11 @@ export async function POST(req: NextRequest) {
     items,
   });
 
-  // ── Contexte requête pour le CAPI (matching Meta)
-  const ua = req.headers.get("user-agent") || undefined;
-  const ip =
-    req.headers.get("x-nf-client-connection-ip") ||
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    undefined;
-  const sourceUrl = req.headers.get("referer") || undefined;
-
   // ── Notifications & journal : non bloquants
-  // CAPI "Lead" au submit (commande passée) — le vrai "Purchase" part à la livraison.
+  // CAPI "Purchase" au submit (commande passée, dédup pixel via event_id = orderNum).
+  // La livraison part en "Delivered" depuis l'admin (api/orders).
   await Promise.allSettled([
-    sendCapiEvent("Lead", {
+    sendCapiEvent("Purchase", {
       orderNum,
       phone: normalized,
       name,
