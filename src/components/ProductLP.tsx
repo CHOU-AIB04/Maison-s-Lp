@@ -11,6 +11,10 @@ import {
   bundleTotal,
   bundleSaving,
   getProduct,
+  variantStock,
+  isVariantInStock,
+  firstAvailableVariant,
+  isProductInStock,
 } from "@/lib/catalog";
 import { UI } from "@/lib/ui-copy";
 import { gtmEvent, type GtmItem } from "@/lib/gtm";
@@ -44,10 +48,13 @@ export default function ProductLP({ product }: { product: LPProduct }) {
   const tr = (v: L) => v[lang];
 
   /* ── Sélection ───────────────────────────────────────── */
-  const [variantKey, setVariantKey] = useState(product.variants[0].key);
+  const initialVariantKey = firstAvailableVariant(product).key;
+  const [variantKey, setVariantKey] = useState(initialVariantKey);
   const [bundleIdx, setBundleIdx] = useState(0);
 
   const variant = product.variants.find((v) => v.key === variantKey) || product.variants[0];
+  const stockLeft = variantStock(product, variant);
+  const inStock = stockLeft > 0;
   const bundle = product.bundles[bundleIdx];
   const qty = bundle.qty;
   const subtotal = product.price * qty;
@@ -180,6 +187,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr("");
+    if (!inStock) return setErr(t.outOfStockMsg);
     if (!name.trim()) return setErr(t.errName);
     const norm = phone.replace(/\s+/g, "").replace(/^\+?212/, "0");
     if (!/^0[567]\d{8}$/.test(norm)) return setErr(t.errPhone);
@@ -245,7 +253,9 @@ export default function ProductLP({ product }: { product: LPProduct }) {
   };
 
   /* ── Upsell ──────────────────────────────────────────── */
-  const upsellProduct = getProduct(product.upsell);
+  const upsellCandidate = getProduct(product.upsell);
+  const upsellProduct = upsellCandidate && isProductInStock(upsellCandidate) ? upsellCandidate : undefined;
+  const upsellVariant = upsellProduct ? firstAvailableVariant(upsellProduct) : undefined;
   const upsellPrice = upsellProduct ? Math.round(upsellProduct.price / 2) : 0;
 
   const addUpsell = async () => {
@@ -262,7 +272,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
           items: [
             {
               name: `${upsellProduct.name.fr} (UPSELL -50%)`,
-              variant: upsellProduct.variants[0].label.fr,
+              variant: upsellVariant!.label.fr,
               quantity: 1,
               price: upsellPrice,
               image: img(upsellProduct.hero, 400),
@@ -274,7 +284,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
           total: upsellPrice,
           product: `${upsellProduct.name.fr} (UPSELL)`,
           model: upsellProduct.id,
-          variant: upsellProduct.variants[0].label.fr,
+          variant: upsellVariant!.label.fr,
           qty: 1,
           lang,
           source: `${product.slug}-upsell`,
@@ -300,7 +310,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
           {
             item_id: upsellProduct.id,
             item_name: `${upsellProduct.name.fr} (UPSELL -50%)`,
-            item_variant: upsellProduct.variants[0].label.fr,
+            item_variant: upsellVariant!.label.fr,
             item_category: upsellProduct.category.fr,
             price: upsellPrice,
             quantity: 1,
@@ -394,6 +404,11 @@ export default function ProductLP({ product }: { product: LPProduct }) {
               <span className="absolute start-4 top-4 z-10 rounded-full bg-[#1a1613] px-3 py-1.5 text-[11px] font-bold tracking-wide text-white">
                 −{discountPct}%
               </span>
+              {!inStock && (
+                <span className="absolute end-4 top-4 z-10 rounded-full bg-white/95 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-red-700 shadow">
+                  {t.outOfStock}
+                </span>
+              )}
 
               <div className="relative aspect-square w-full">
                 {product.variants.map((v, k) => (
@@ -403,13 +418,13 @@ export default function ProductLP({ product }: { product: LPProduct }) {
                     srcSet={`${img(v.img, 450)} 450w, ${img(v.img, 700)} 700w, ${img(v.img, 1000)} 1000w`}
                     sizes="(min-width: 1024px) 560px, 100vw"
                     alt={`${product.name.fr} — ${tr(v.label)}`}
-                    loading={k === 0 ? "eager" : "lazy"}
-                    fetchPriority={k === 0 ? "high" : "low"}
+                    loading={v.key === initialVariantKey ? "eager" : "lazy"}
+                    fetchPriority={v.key === initialVariantKey ? "high" : "low"}
                     decoding="async"
                     aria-hidden={galleryIdx !== k}
                     className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-200 ease-out ${
                       galleryIdx === k ? "opacity-100" : "opacity-0"
-                    }`}
+                    } ${isVariantInStock(product, v) ? "" : "grayscale-[60%]"}`}
                   />
                 ))}
               </div>
@@ -456,13 +471,24 @@ export default function ProductLP({ product }: { product: LPProduct }) {
                   <button
                     key={v.key}
                     onClick={() => setVariantKey(v.key)}
-                    aria-label={tr(v.label)}
-                    title={tr(v.label)}
-                    className={`h-[64px] w-[64px] shrink-0 snap-start overflow-hidden rounded-[2px] border transition sm:h-[74px] sm:w-[74px] ${
+                    aria-label={isVariantInStock(product, v) ? tr(v.label) : `${tr(v.label)} — ${t.outOfStock}`}
+                    title={isVariantInStock(product, v) ? tr(v.label) : `${tr(v.label)} — ${t.outOfStock}`}
+                    className={`relative h-[64px] w-[64px] shrink-0 snap-start overflow-hidden rounded-[2px] border transition sm:h-[74px] sm:w-[74px] ${
                       galleryIdx === i ? "border-[#1a1613]" : "border-[#e7ddca] opacity-70 hover:opacity-100"
                     }`}
                   >
-                    <img src={img(v.img, 170)} alt={tr(v.label)} loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                    <img
+                      src={img(v.img, 170)}
+                      alt={tr(v.label)}
+                      loading="lazy"
+                      decoding="async"
+                      className={`h-full w-full object-cover ${isVariantInStock(product, v) ? "" : "grayscale"}`}
+                    />
+                    {!isVariantInStock(product, v) && (
+                      <span className="absolute inset-x-0 bottom-0 bg-[#1a1613]/80 py-0.5 text-center text-[9px] font-bold uppercase tracking-wide text-white">
+                        {t.outOfStockShort}
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -509,9 +535,10 @@ export default function ProductLP({ product }: { product: LPProduct }) {
 
             {/* Modèle */}
             {product.variants.length > 1 && (
-              <div className="order-2 mb-6 lg:order-3">
+              <div id="modele" className="order-2 mb-6 scroll-mt-24 lg:order-3">
                 <div className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8a8172]">
                   {t.model} — <span className="text-[#1a1613]">{tr(variant.label)}</span>
+                  {!inStock && <span className="ms-2 text-red-700">· {t.outOfStock}</span>}
                 </div>
                 <select
                   className="field"
@@ -522,9 +549,13 @@ export default function ProductLP({ product }: { product: LPProduct }) {
                   {product.variants.map((v) => (
                     <option key={v.key} value={v.key}>
                       {tr(v.label)}
+                      {isVariantInStock(product, v) ? "" : ` — ${t.outOfStockShort}`}
                     </option>
                   ))}
                 </select>
+                {!inStock && (
+                  <p className="mt-3 rounded-[3px] bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700">{t.outOfStockMsg}</p>
+                )}
                 {variant.desc && <p className="mt-3 text-sm leading-relaxed text-[#6b6353]">{tr(variant.desc)}</p>}
               </div>
             )}
@@ -658,10 +689,10 @@ export default function ProductLP({ product }: { product: LPProduct }) {
 
               <button
                 type="submit"
-                disabled={status === "sending"}
-                className="w-full rounded-[3px] bg-[#1a1613] py-4 text-[15px] font-bold tracking-wide text-white transition hover:bg-[#2c2721] disabled:opacity-60"
+                disabled={status === "sending" || !inStock}
+                className="w-full rounded-[3px] bg-[#1a1613] py-4 text-[15px] font-bold tracking-wide text-white transition hover:bg-[#2c2721] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {status === "sending" ? t.sending : `${t.submit} — ${total} ${t.dh}`}
+                {!inStock ? t.outOfStockCta : status === "sending" ? t.sending : `${t.submit} — ${total} ${t.dh}`}
               </button>
 
               <p className="text-center text-xs text-[#8a8172]">🔒 {t.cod} · {t.freeShip}</p>
@@ -676,9 +707,15 @@ export default function ProductLP({ product }: { product: LPProduct }) {
                 </span>
               </p>
             )}
-            <p className="order-6 mt-1.5 flex items-center gap-2.5 text-[12px] md:text-[15px] font-semibold text-[#b8791a]">
-              <span className="text-lg">⚡</span> {t.lowStock(product.stock)}
-            </p>
+            {inStock ? (
+              <p className="order-6 mt-1.5 flex items-center gap-2.5 text-[12px] md:text-[15px] font-semibold text-[#b8791a]">
+                <span className="text-lg">⚡</span> {t.lowStock(stockLeft)}
+              </p>
+            ) : (
+              <p className="order-6 mt-1.5 flex items-center gap-2.5 text-[12px] md:text-[15px] font-semibold text-red-700">
+                <span className="text-lg">⛔</span> {t.outOfStock} — {tr(variant.label)}
+              </p>
+            )}
 
             {/* Avis en vitrine */}
             <div className="order-6 mt-5 border-t border-[#e7ddca] pt-4">
@@ -921,15 +958,24 @@ export default function ProductLP({ product }: { product: LPProduct }) {
         dir={dir}
         className="fixed inset-x-0 bottom-0 z-50 border-t border-[#e7ddca] bg-white/95 px-3 py-2.5 backdrop-blur"
       >
-        <button
-          onClick={goToForm}
-          className="mx-auto flex w-full max-w-lg items-center justify-between rounded-[3px] bg-[#1a1613] px-6 py-3.5 text-white"
-        >
-          <span className="font-bold tracking-wide">{t.ctaShort}</span>
-          <span className="font-display text-lg font-bold">
-            {total} {t.dh}
-          </span>
-        </button>
+        {inStock ? (
+          <button
+            onClick={goToForm}
+            className="mx-auto flex w-full max-w-lg items-center justify-between rounded-[3px] bg-[#1a1613] px-6 py-3.5 text-white"
+          >
+            <span className="font-bold tracking-wide">{t.ctaShort}</span>
+            <span className="font-display text-lg font-bold">
+              {total} {t.dh}
+            </span>
+          </button>
+        ) : (
+          <button
+            onClick={() => document.getElementById("modele")?.scrollIntoView({ behavior: "smooth" })}
+            className="mx-auto flex w-full max-w-lg items-center justify-center rounded-[3px] bg-[#6b6353] px-6 py-3.5 text-sm font-bold tracking-wide text-white"
+          >
+            {t.outOfStockCta}
+          </button>
+        )}
       </div>
     </div>
   );

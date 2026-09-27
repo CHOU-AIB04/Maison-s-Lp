@@ -3,6 +3,7 @@ import { ordersStore } from "@/lib/store";
 import { FORCELOG_CITIES } from "@/lib/cities";
 import { buildOrderEmailHtml, type EmailItem } from "@/lib/order-email";
 import { pushNtfy } from "@/lib/notify";
+import { PRODUCTS, isVariantInStock } from "@/lib/catalog";
 
 export const runtime = "nodejs";
 
@@ -193,6 +194,13 @@ export async function POST(req: NextRequest) {
   const city = FORCELOG_CITIES.find((c) => c.code === cityCode);
   if (!city) {
     return NextResponse.json({ ok: false, error: "bad_city" }, { status: 422 });
+  }
+
+  // Stock par variante : refuse une commande sur un coloris en rupture
+  const lpProduct = PRODUCTS.find((p) => p.id === body.model);
+  const lpVariant = lpProduct?.variants.find((v) => v.label.fr === body.variant);
+  if (lpProduct && lpVariant && !isVariantInStock(lpProduct, lpVariant)) {
+    return NextResponse.json({ ok: false, error: "out_of_stock" }, { status: 409 });
   }
 
   const items: OrderItem[] =

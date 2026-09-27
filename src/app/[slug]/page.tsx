@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ProductLP from "@/components/ProductLP";
-import { PRODUCTS, getProduct, img } from "@/lib/catalog";
+import { PRODUCTS, getProduct, img, firstAvailableVariant, isProductInStock } from "@/lib/catalog";
 
 export const dynamicParams = false;
 
@@ -51,7 +51,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       "@type": "Offer",
       priceCurrency: "MAD",
       price: product.price,
-      availability: "https://schema.org/InStock",
+      availability: isProductInStock(product) ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       itemCondition: "https://schema.org/NewCondition",
       shippingDetails: {
         "@type": "OfferShippingDetails",
@@ -83,7 +83,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     })),
   };
 
-  const heroSrc = product.variants[0].img; // = variantGallery(...)[0]
+  const heroSrc = firstAvailableVariant(product).img; // = image affichée au chargement
 
   return (
     <>

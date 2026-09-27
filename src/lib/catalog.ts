@@ -15,7 +15,13 @@ export const INSTAGRAM = "https://www.instagram.com/maison_dor_accessoires/";
 export type Lang = "fr" | "ar";
 export type L = { fr: string; ar: string };
 
-export type Variant = { key: string; label: L; img: string; gallery?: string[]; desc?: L };
+/**
+ * stock (optionnel) : stock propre à la variante.
+ *   - absent  → la variante suit `product.stock`
+ *   - 0       → RUPTURE : reste visible sur la LP, mais non commandable
+ *   - n > 0   → "Plus que n pièces" affiché pour cette variante
+ */
+export type Variant = { key: string; label: L; img: string; gallery?: string[]; desc?: L; stock?: number };
 export type Bundle = { qty: number; total: number; badge?: L };
 export type Benefit = { icon: string; title: L; desc: L };
 export type Faq = { q: L; a: L };
@@ -194,8 +200,8 @@ export const PRODUCTS: LPProduct[] = [
     name: { fr: "Ensemble Tulip", ar: "طقم Tulip" },
     category: { fr: "Parures Tulip", ar: "أطقم Tulip" },
     headline: {
-      fr: "Collier + bracelet assortis — 4 modèles, un seul prix",
-      ar: "عقد + سوار متناسقين — 4 موديلات، ثمن واحد",
+      fr: "Collier + bracelet assortis — 5 modèles, un seul prix",
+      ar: "عقد + سوار متناسقين — 5 موديلات، ثمن واحد",
     },
     subheadline: {
       fr: "Parures florales serties de cristaux sur acier inoxydable plaqué or 18K ou argent rhodié. Choisissez votre modèle, on vous le livre en coffret — vous payez à la réception.",
@@ -267,10 +273,21 @@ export const PRODUCTS: LPProduct[] = [
         },
         gallery: ["v1782485785/prod9_white_c_b55akf.jpg", "v1782485777/prod9_black_c_m47wyw.jpg"],
       },
+      {
+        key: "rose-violet",
+        label: { fr: "Rose · Violet", ar: "زهري · بنفسجي" },
+        img: "v1790528237/Gemini_Generated_Image_bmp2skbmp2skbmp2_s8nnid.jpg",
+        stock: 7,
+        desc: {
+          fr: "Cristaux rose et violet réunis sur la même parure : doux et féminin, parfait à offrir.",
+          ar: "كريستال زهري وبنفسجي فنفس الطقم: ناعم وأنثوي، مثالي كهدية.",
+        },
+        gallery: ["v1790528237/Gemini_Generated_Image_bmp2skbmp2skbmp2_s8nnid.jpg"],
+      },
     ],
     bundles: bundlesFor(139, 30, 50),
     usps: [
-      { fr: "4 modèles au même prix", ar: "4 موديلات بنفس الثمن" },
+      { fr: "5 modèles au même prix", ar: "5 موديلات بنفس الثمن" },
       { fr: "Collier + bracelet en coffret", ar: "عقد + سوار فعلبة" },
       { fr: "Ne noircit pas, ne verdit pas", ar: "ما كيسودش وما كيخضّرش" },
       { fr: "Livraison gratuite · paiement à la réception", ar: "توصيل مجاني · الخلاص عند الاستلام" },
@@ -280,14 +297,14 @@ export const PRODUCTS: LPProduct[] = [
     story: {
       title: { fr: "Quel modèle Tulip choisir ?", ar: "شنو الموديل Tulip اللي تختاري؟" },
       body: {
-        fr: "Les quatre modèles partagent exactement la même fabrication : base en acier inoxydable, plaquage or 18K ou rhodiage argent, cristaux sertis un par un. La différence est purement esthétique. Bicolore est le plus habillé, avec ses cristaux améthyste en cascade — c'est celui qu'on choisit pour un mariage ou un cadeau. Dorée est le plus polyvalent : cristal transparent, aucune couleur à assortir, c'est notre plus grosse vente. Argentée s'adresse à celles qui portent déjà de l'argent ou une montre en acier. Rouge est le plus affirmé, pensé pour le caftan et les soirées. Si vous hésitez, prenez Dorée : c'est celui qui se porte le plus souvent.",
-        ar: "الأربعة موديلات عندهم نفس الصناعة: قاعدة من الفولاذ المقاوم للصدأ، طلاء ذهبي 18 قيراط ولا فضي، وكريستال مرصّع حبة بحبة. الفرق غير جمالي. ثنائي اللون هو الأكثر أناقة بالأميتيست — وهو اللي كيتختار للعرس ولا للهدية. الذهبي هو الأكثر استعمالًا: كريستال شفاف، بلا لون خاصك تناسبيه، وهو الأكثر مبيعًا عندنا. الفضي لللي كتلبس الفضة ولا ماكينة ديال الفولاذ. والأحمر هو الأقوى، مصمم للقفطان والسهرات. إلى حتارتي، خدي الذهبي.",
+        fr: "Les cinq modèles partagent exactement la même fabrication : base en acier inoxydable, plaquage or 18K ou rhodiage argent, cristaux sertis un par un. La différence est purement esthétique. Bicolore est le plus habillé, avec ses cristaux améthyste en cascade — c'est celui qu'on choisit pour un mariage ou un cadeau. Dorée est le plus polyvalent : cristal transparent, aucune couleur à assortir, c'est notre plus grosse vente. Argentée s'adresse à celles qui portent déjà de l'argent ou une montre en acier. Rouge est le plus affirmé, pensé pour le caftan et les soirées. Rose · Violet est le plus doux, idéal à offrir. Si vous hésitez, prenez Dorée : c'est celui qui se porte le plus souvent.",
+        ar: "الخمسة موديلات عندهم نفس الصناعة: قاعدة من الفولاذ المقاوم للصدأ، طلاء ذهبي 18 قيراط ولا فضي، وكريستال مرصّع حبة بحبة. الفرق غير جمالي. ثنائي اللون هو الأكثر أناقة بالأميتيست — وهو اللي كيتختار للعرس ولا للهدية. الذهبي هو الأكثر استعمالًا: كريستال شفاف، بلا لون خاصك تناسبيه، وهو الأكثر مبيعًا عندنا. الفضي لللي كتلبس الفضة ولا ماكينة ديال الفولاذ. والأحمر هو الأقوى، مصمم للقفطان والسهرات. والزهري · البنفسجي هو الأنعم، مثالي كهدية. إلى حتارتي، خدي الذهبي.",
       },
     },
     specs: SPECS_ACIER,
     faq: [
       {
-        q: { fr: "Les 4 modèles sont-ils au même prix ?", ar: "واش الأربعة موديلات بنفس الثمن؟" },
+        q: { fr: "Les 5 modèles sont-ils au même prix ?", ar: "واش الخمسة موديلات بنفس الثمن؟" },
         a: {
           fr: "Oui, 139 dh quel que soit le modèle choisi, livraison comprise. Le pack de 2 ou 3 peut mélanger les modèles : indiquez-le simplement lors de l'appel de confirmation.",
           ar: "إيه، 139 درهم لأي موديل، والتوصيل داخل. الباك ديال 2 ولا 3 تقدري تخلطي فيه الموديلات: غير قوليها للمكلف منين نعيطو ليك باش نأكدو.",
@@ -305,9 +322,9 @@ export const PRODUCTS: LPProduct[] = [
     ],
     upsell: "ensemble-swan",
     seo: {
-      title: "Ensemble Tulip 🌷 Collier + Bracelet — 4 modèles, 139 dh | Maison d'Or",
+      title: "Ensemble Tulip 🌷 Collier + Bracelet — 5 modèles, 139 dh | Maison d'Or",
       description:
-        "Parure Tulip : collier + bracelet sertis de cristaux, 4 modèles au choix (Rouge, Bicolore, Dorée, Argentée). Ne ternit pas, hypoallergénique. Livraison gratuite au Maroc, paiement à la livraison.",
+        "Parure Tulip : collier + bracelet sertis de cristaux, 5 modèles au choix (Rouge, Bicolore, Dorée, Argentée, Rose · Violet). Ne ternit pas, hypoallergénique. Livraison gratuite au Maroc, paiement à la livraison.",
     },
   },
 
@@ -346,6 +363,7 @@ export const PRODUCTS: LPProduct[] = [
     variants: [
       {
         key: "amethyste",
+        stock: 6,
         label: { fr: "Améthyste", ar: "أميتيست" },
         img: "v1782485765/prod3_white_C_agk2ln.jpg",
         desc: {
@@ -360,6 +378,7 @@ export const PRODUCTS: LPProduct[] = [
       },
       {
         key: "blanc",
+        stock: 0,  // RUPTURE — visible mais non commandable
         label: { fr: "Blanc", ar: "أبيض" },
         img: "v1782497783/prod13_white_c_oruw4c.jpg",
         desc: {
@@ -373,6 +392,7 @@ export const PRODUCTS: LPProduct[] = [
       },
       {
         key: "noir-dore",
+        stock: 6,
         label: { fr: "Noir & Doré", ar: "أسود · ذهبي" },
         img: "v1782485789/prod12_white_c_cg7zrs.jpg",
         desc: {
@@ -386,6 +406,7 @@ export const PRODUCTS: LPProduct[] = [
       },
       {
         key: "rose-argent",
+        stock: 0,  // RUPTURE — visible mais non commandable
         label: { fr: "Rose & Argent", ar: "زهري · فضي" },
         img: "v1782498863/image_1782498175677_w6b338_kjhxey.jpg",
         desc: {
@@ -399,6 +420,7 @@ export const PRODUCTS: LPProduct[] = [
       },
       {
         key: "argent-violet",
+        stock: 6,
         label: { fr: "Argent & Violet", ar: "فضي · بنفسجي" },
         img: "v1782485781/prod6_whie_c_ne2gnl.jpg",
         desc: {
@@ -412,6 +434,7 @@ export const PRODUCTS: LPProduct[] = [
       },
       {
         key: "rose",
+        stock: 6,
         label: { fr: "Rose", ar: "زهري" },
         img: "v1782485766/prod2_white_C_gvnwin.jpg",
         desc: {
@@ -582,6 +605,14 @@ export const PRODUCTS: LPProduct[] = [
 /* ═══════════════════════════════════════════════════════════
    HELPERS
    ═══════════════════════════════════════════════════════════ */
+
+/* ── Stock par variante ─────────────────────────────────── */
+export const variantStock = (product: LPProduct, variant: Variant) => variant.stock ?? product.stock;
+export const isVariantInStock = (product: LPProduct, variant: Variant) => variantStock(product, variant) > 0;
+/** Première variante disponible (sinon la première tout court). */
+export const firstAvailableVariant = (product: LPProduct) =>
+  product.variants.find((v) => isVariantInStock(product, v)) ?? product.variants[0];
+export const isProductInStock = (product: LPProduct) => product.variants.some((v) => isVariantInStock(product, v));
 
 export const getProduct = (slug: string) => PRODUCTS.find((p) => p.slug === slug);
 export const getAllSlugs = () => PRODUCTS.map((p) => p.slug);
