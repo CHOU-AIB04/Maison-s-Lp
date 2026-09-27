@@ -244,7 +244,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
       if (!json.ok) throw new Error(json.error || "err");
 
       setOrderNum(json.orderNum || "");
-      track("Lead", {
+      track("Purchase", {
         content_name: product.name.fr,
         content_ids: [product.id],
         content_type: "product",
@@ -311,13 +311,14 @@ export default function ProductLP({ product }: { product: LPProduct }) {
       });
       const json = await res.json();
       if (!json.ok) throw new Error();
-      track("Lead", {
+      track("Purchase", {
         content_name: `${upsellProduct.name.fr} UPSELL`,
         content_ids: [upsellProduct.id],
+        content_type: "product",
         value: upsellPrice,
         currency: "MAD",
         num_items: 1,
-      });
+      }, json.orderNum);
       gtmEvent("purchase", {
         transaction_id: `${json.orderNum || Date.now()}-UPSELL`,
         currency: "MAD",
