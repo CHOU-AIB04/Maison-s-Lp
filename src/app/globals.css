@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 :root {
+  /* La LP s'affiche TOUJOURS en clair (évite le rendu cassé en dark mode / navigateurs in-app IG/FB) */
+  color-scheme: light;
   --gold: #c9a24b;
   --gold-dark: #a8842f;
   --ink: #1a1613;
@@ -14,6 +16,7 @@
 
 html {
   scroll-behavior: smooth;
+  background: var(--cream);
 }
 
 /* Latin = Jost / Cormorant (comme le site), Arabe = Tajawal / Cairo en fallback glyphes */
@@ -21,6 +24,11 @@ body {
   background: var(--cream);
   color: var(--ink);
   font-family: var(--font-jost), var(--font-tajawal), system-ui, sans-serif;
+}
+
+/* Force les champs de formulaire en clair (sinon inputs/selects sombres en dark mode) */
+input, select, textarea, button {
+  color-scheme: light;
 }
 
 .font-display {

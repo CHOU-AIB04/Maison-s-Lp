@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Cairo, Tajawal, Cormorant_Garamond, Jost } from "next/font/google";
 import "./globals.css";
 
 const META_PIXEL_ID = "36659330483710557";
-const GTM_ID = "GTM-TLJPKJ7H";
+const CLARITY_ID = "xkzwfucjjh";
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://lp-maison-dor.vercel.app";
 
 // Polices du site maison-dor.store : Cormorant Garamond (titres) + Jost (texte)
@@ -46,9 +46,15 @@ export const metadata: Metadata = {
     template: "%s",
   },
   description:
-    "Parures Tulip et Swan en plaqué or 18K et argent rhodié. Livraison gratuite partout au Maroc, paiement à la livraison.",
+    "Parures Tulip et Swan en acier inoxydable de qualité (doré ou argenté). Livraison gratuite partout au Maroc, paiement à la livraison.",
   robots: { index: true, follow: true },
-  icons: { icon: "/favicon.ico" },
+  icons: { icon: "/logo.jpg", apple: "/logo.jpg" },
+};
+
+// Force l'affichage clair (évite le rendu cassé en dark mode / navigateurs in-app IG/FB)
+export const viewport: Viewport = {
+  colorScheme: "light",
+  themeColor: "#faf6ef",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -59,19 +65,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
 
-        {/* Google Tag Manager */}
-        <Script
-          id="gtm-head"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','${GTM_ID}');`,
-          }}
-        />
-        {/* End Google Tag Manager */}
+        {/* Microsoft Clarity (en direct — plus via GTM, pour éviter le double pixel Meta) */}
+        <Script id="clarity" strategy="afterInteractive">
+          {`(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","${CLARITY_ID}");`}
+        </Script>
 
         <Script id="meta-pixel" strategy="afterInteractive">
           {`!function(f,b,e,v,n,t,s)
@@ -89,17 +86,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       <body
         className={`${cormorant.variable} ${jost.variable} ${cairo.variable} ${tajawal.variable} min-h-full antialiased`}
       >
-        {/* Google Tag Manager (noscript) */}
-        <noscript>
-          <iframe
-            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-          />
-        </noscript>
-        {/* End Google Tag Manager (noscript) */}
-
         <noscript>
           <img
             height="1"

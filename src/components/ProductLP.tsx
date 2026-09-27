@@ -22,11 +22,20 @@ import { FORCELOG_CITIES } from "@/lib/cities";
 
 type Status = "idle" | "sending" | "done";
 
+/** Upsell post-commande désactivé (repasser à true pour le réactiver). */
+const UPSELL_ENABLED = false;
+
+/** UTM + IDs de campagne Meta captés dans l'URL de l'annonce. */
+const UTM_KEYS = [
+  "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id",
+  "ad_id", "adset_id", "campaign_id", "fbclid",
+] as const;
+
 /* ── Meta Pixel ─────────────────────────────────────────── */
 type Fbq = (...args: unknown[]) => void;
-const track = (event: string, data?: Record<string, unknown>) => {
+const track = (event: string, data?: Record<string, unknown>, eventID?: string) => {
   if (typeof window === "undefined") return;
-  (window as unknown as { fbq?: Fbq }).fbq?.("track", event, data);
+  (window as unknown as { fbq?: Fbq }).fbq?.("track", event, data, eventID ? { eventID } : undefined);
 };
 
 function Stars({ n = 5, className = "" }: { n?: number; className?: string }) {
@@ -78,7 +87,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
   const [err, setErr] = useState("");
   const [orderNum, setOrderNum] = useState("");
   const [upsellState, setUpsellState] = useState<"offer" | "adding" | "added" | "declined">("offer");
-  const [utm, setUtm] = useState({ source: "", content: "" });
+  const [utm, setUtm] = useState<Record<string, string>>({});
   const [revIdx, setRevIdx] = useState(0);
   const touchX = useRef<number | null>(null);
   const checkoutStarted = useRef(false);
@@ -102,7 +111,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
     setDelivery({ a: fmt(a), b: fmt(b) });
   }, [lang]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /** utm_source / utm_content : lus dans l'URL, conservés pour la session. */
+  /** UTM + IDs Meta (campaign/adset/ad) : lus dans l'URL, conservés pour la session. */
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
     const pick = (key: string) => {
@@ -114,7 +123,12 @@ export default function ProductLP({ product }: { product: LPProduct }) {
         return fromUrl ?? "";
       }
     };
-    setUtm({ source: pick("utm_source"), content: pick("utm_content") });
+    const collected: Record<string, string> = {};
+    UTM_KEYS.forEach((key) => {
+      const v = pick(key);
+      if (v) collected[key] = v;
+    });
+    setUtm(collected);
   }, []);
 
   useEffect(() => {
@@ -221,22 +235,23 @@ export default function ProductLP({ product }: { product: LPProduct }) {
           qty,
           lang,
           source: product.slug,
-          utmSource: utm.source,
-          utmContent: utm.content,
+          utm,
+          utmSource: utm.utm_source || "",
+          utmContent: utm.utm_content || "",
         }),
       });
       const json = await res.json();
       if (!json.ok) throw new Error(json.error || "err");
 
       setOrderNum(json.orderNum || "");
-      track("Purchase", {
+      track("Lead", {
         content_name: product.name.fr,
         content_ids: [product.id],
         content_type: "product",
         value: total,
         currency: "MAD",
         num_items: qty,
-      });
+      }, json.orderNum);
       gtmEvent("purchase", {
         transaction_id: json.orderNum || `MDO-${Date.now()}`,
         currency: "MAD",
@@ -288,13 +303,15 @@ export default function ProductLP({ product }: { product: LPProduct }) {
           qty: 1,
           lang,
           source: `${product.slug}-upsell`,
-          utmSource: utm.source,
-          utmContent: utm.content,
+          addonToOrderNum: orderNum,
+          utm,
+          utmSource: utm.utm_source || "",
+          utmContent: utm.utm_content || "",
         }),
       });
       const json = await res.json();
       if (!json.ok) throw new Error();
-      track("Purchase", {
+      track("Lead", {
         content_name: `${upsellProduct.name.fr} UPSELL`,
         content_ids: [upsellProduct.id],
         value: upsellPrice,
@@ -335,7 +352,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
           <h1 className="font-display mb-3 text-3xl font-black">{t.doneTitle}</h1>
           <p className="mb-8 text-[#5b5346]">{t.doneMsg(orderNum)}</p>
 
-          {upsellProduct && upsellState !== "added" && upsellState !== "declined" && (
+          {UPSELL_ENABLED && upsellProduct && upsellState !== "added" && upsellState !== "declined" && (
             <div className="rounded-3xl border-2 border-[var(--gold)] bg-white p-5 text-start shadow-xl">
               <div className="mb-3 inline-block rounded-full gold-bg px-3 py-1 text-xs font-bold text-white">
                 {t.upsellBadge}
@@ -524,9 +541,9 @@ export default function ProductLP({ product }: { product: LPProduct }) {
               </span>
             </div>
 
-            <ul className="order-5 mb-6 space-y-2 lg:order-2">
+            <ul className="order-5 mb-6 space-y-3.5 lg:order-2">
               {product.usps.map((u, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-[15px] leading-snug text-[#4a4436]">
+                <li key={i} className="flex items-start gap-2.5 text-[15px] leading-relaxed text-[#4a4436]">
                   <span>{["✨", "💧", "🌿", "🎁"][i % 4]}</span>
                   <span>{tr(u)}</span>
                 </li>
@@ -629,8 +646,9 @@ export default function ProductLP({ product }: { product: LPProduct }) {
                 {t.formTitle}
               </p>
 
-              <input type="hidden" name="utm_source" value={utm.source} readOnly />
-              <input type="hidden" name="utm_content" value={utm.content} readOnly />
+              {UTM_KEYS.map((key) => (
+                <input key={key} type="hidden" name={key} value={utm[key] || ""} readOnly />
+              ))}
 
               <input id="f-name" className="field" placeholder={t.fName} value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
               <input className="field" type="tel" inputMode="tel" placeholder={t.fPhone} value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" />
@@ -674,14 +692,7 @@ export default function ProductLP({ product }: { product: LPProduct }) {
               {err && <p className="rounded-[3px] bg-red-50 px-4 py-2.5 text-sm font-bold text-red-600">{err}</p>}
 
               <div className="flex items-center justify-between border-t border-[#f0e8d8] pt-3 text-sm">
-                <span className="font-semibold">
-                  {t.total}
-                  {discount > 0 && (
-                    <span className="ms-2 text-xs font-bold text-green-700">
-                      − {discount} {t.dh}
-                    </span>
-                  )}
-                </span>
+                <span className="font-semibold">{t.total}</span>
                 <span className="font-display text-[26px] font-bold text-[var(--gold-dark)]">
                   {total} {t.dh}
                 </span>
@@ -1002,7 +1013,10 @@ function TopBar({
       </div>
       <header className="sticky top-0 z-40 border-b border-[#e7ddca] bg-[var(--cream)]/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <span className="font-display text-xl font-extrabold gold-text">Maison d&apos;Or</span>
+          <span className="flex items-center gap-2.5">
+            <img src="/logo.jpg" alt="Maison d'Or" width={36} height={36} className="h-9 w-9 rounded-full object-cover ring-1 ring-[var(--gold)]/40" />
+            <span className="font-display text-xl font-extrabold gold-text">Maison d&apos;Or</span>
+          </span>
           <button
             onClick={() => setLang(lang === "fr" ? "ar" : "fr")}
             className="rounded-full border border-[var(--gold)] px-4 py-1.5 text-sm font-bold text-[var(--gold-dark)] transition hover:bg-[var(--gold)] hover:text-white"

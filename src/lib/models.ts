@@ -56,7 +56,7 @@ export const SWAN: Model = {
   nameAr: "طقم Swan · عقد + سوار",
   nameFr: "Ensemble Swan · Collier + Bracelet",
   subAr: "تصميم Swan راقٍ · ذهب مقاوم · أناقة تلفت الأنظار",
-  subFr: "Design Swan raffiné · Plaqué or résistant · Une élégance qui attire les regards",
+  subFr: "Design Swan raffiné · Acier inoxydable résistant · Une élégance qui attire les regards",
   hero: "v1782485788/prod12_black_c_nqjzw6.jpg",
   qtyPct: 21,
   colors: [
@@ -85,7 +85,7 @@ export const TULIP: Model = {
   nameAr: "طقم Tulip · عقد + سوار",
   nameFr: "Ensemble Tulip · Collier + Bracelet",
   subAr: "تصميم Tulip زهري · لمسة أنوثة راقية · ذهب مقاوم",
-  subFr: "Design floral Tulip · Une touche de féminité raffinée · Plaqué or résistant",
+  subFr: "Design floral Tulip · Une touche de féminité raffinée · Acier inoxydable résistant",
   hero: "v1783970112/768b1aec724deadb6a4cc64a180ccfc7_1_1783969735_4237_xn6aze.png",
   qtyPct: 20,
   colors: [

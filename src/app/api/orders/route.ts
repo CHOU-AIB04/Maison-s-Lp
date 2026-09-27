@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ordersStore, statusStore } from "@/lib/store";
+import { sendCapiEvent } from "@/lib/capi";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -70,9 +71,64 @@ export async function PATCH(req: NextRequest) {
   }
   try {
     const map = await getStatusMap();
+    const prev = map[id];
     map[id] = status as Status;
     await statusStore().setJSON(STATUS_KEY, map);
+
+    // ── Livrée = la VRAIE vente (COD payé) → CAPI Purchase (une seule fois)
+    if (status === "delivered" && prev !== "delivered") {
+      try {
+        const o = (await ordersStore().get(String(id), { type: "json" })) as Record<string, unknown> | null;
+        if (o) {
+          await sendCapiEvent("Purchase", {
+            orderNum: `${id}-purchase`,
+            phone: String(o.phone || ""),
+            name: String(o.name || ""),
+            value: Number(o.total) || 0,
+            numItems: Number(o.qty) || 1,
+            fbc: o.fbc ? String(o.fbc) : undefined,
+            fbp: o.fbp ? String(o.fbp) : undefined,
+          });
+        }
+      } catch (e) {
+        console.error("CAPI Purchase (delivered) failed:", e);
+      }
+    }
     return NextResponse.json({ ok: true, id, status });
+  } catch (e) {
+    return NextResponse.json(
+      { ok: false, error: "blob_error", message: e instanceof Error ? e.message : String(e) },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  if (!authOk(req)) {
+    return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
+  }
+  let body: { id?: string };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ ok: false, error: "bad_json" }, { status: 400 });
+  }
+  const id = body.id;
+  if (!id) {
+    return NextResponse.json({ ok: false, error: "bad_params" }, { status: 422 });
+  }
+  try {
+    await ordersStore().delete(String(id));
+    try {
+      const map = await getStatusMap();
+      if (map[id]) {
+        delete map[id];
+        await statusStore().setJSON(STATUS_KEY, map);
+      }
+    } catch {
+      /* sans conséquence */
+    }
+    return NextResponse.json({ ok: true, id });
   } catch (e) {
     return NextResponse.json(
       { ok: false, error: "blob_error", message: e instanceof Error ? e.message : String(e) },
